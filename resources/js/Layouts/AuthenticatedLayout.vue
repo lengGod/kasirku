@@ -50,7 +50,6 @@ const navigation = [
         items: [
             { label: 'Laporan', route: 'reports.index', match: 'reports.*', ability: 'view_reports' },
             { label: 'Shift Kasir', route: 'shifts.index', match: 'shifts.*' },
-            { label: 'Pengguna', route: 'users.index', match: 'users.*', ability: 'manage_users' },
             { label: 'Pengaturan', route: 'settings.store', match: 'settings.*', ability: 'manage_settings' },
         ]
     },
@@ -151,7 +150,6 @@ watch(showMobileMenu, (val) => {
                                 <p class="text-xs font-semibold text-ink truncate">{{ user.name }}</p>
                                 <p class="text-lime/80 text-[10px] font-semibold">{{ roleLabel }}</p>
                             </div>
-                            <Link :href="route('profile.edit')" @click="closeMenus" class="block px-6 py-3 text-sm text-ink hover:bg-surface-2">Profil</Link>
                             <Link :href="route('logout')" method="post" as="button" @click="closeMenus" 
                                 class="w-full text-left px-6 py-3 text-sm text-ink hover:bg-surface-2">
                                 Keluar

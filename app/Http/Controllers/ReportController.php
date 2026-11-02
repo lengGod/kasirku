@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Setting;
 use App\Models\Shift;
-use App\Models\StockMovement;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +46,7 @@ class ReportController extends Controller
 
         return response()->streamDownload(function () use ($report): void {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, $report['headers']);
 
             foreach ($report['rows'] as $row) {
@@ -53,7 +54,9 @@ class ReportController extends Controller
             }
 
             fclose($handle);
-        }, "laporan-{$type}-".now()->format('Ymd').'.csv', ['Content-Type' => 'text/csv']);
+        }, "laporan-{$type}-".now()->format('Ymd').'.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function pdf(Request $request, string $type)
@@ -229,7 +232,7 @@ class ReportController extends Controller
 
     private function stockReport(): array
     {
-        $products = \App\Models\Product::query()
+        $products = Product::query()
             ->with(['unit'])
             ->withSum('stocks as stock_quantity', 'quantity')
             ->orderBy('name')

@@ -5,7 +5,7 @@ import PageHeader from '@/Components/PageHeader.vue';
 import FormInput from '@/Components/FormInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { formatRupiah, formatNumber } from '@/Utils/format';
 import { Download, Filter } from '@lucide/vue';
 import { ref } from 'vue';
@@ -65,9 +65,12 @@ const formatSummary = (key, value) => {
 };
 
 const goExport = () => {
-    router.get(route('reports.export', props.type), { date_from: filters.date_from, date_to: filters.date_to }, {
-        onSuccess: () => {},
+    const query = new URLSearchParams({
+        date_from: filters.date_from,
+        date_to: filters.date_to,
     });
+
+    window.location.href = `${route('reports.export', props.type)}?${query.toString()}`;
 };
 
 const goPdf = () => {

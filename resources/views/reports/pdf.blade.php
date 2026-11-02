@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
         @page { margin: 12mm; size: A4; }
         body { font-family: sans-serif; font-size: 12px; color: #111; line-height: 1.4; }
         h1 { font-size: 18px; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .store { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
         .subtitle { font-size: 11px; color: #555; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 12px; }
         th { background: #14123A; color: #fff; text-align: left; padding: 6px 8px; font-size: 10px; text-transform: uppercase; }
@@ -22,6 +23,7 @@ use Illuminate\Support\Carbon;
     </style>
 </head>
 <body>
+    <div class="store">{{ $store }}</div>
     <h1>{{ $title }}</h1>
     <div class="subtitle">{{ Carbon::now()->locale('id')->isoFormat('dddd, DD MMMM YYYY HH:mm') }}</div>
 
