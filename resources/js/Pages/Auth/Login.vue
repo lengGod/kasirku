@@ -4,15 +4,15 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import AttributionBanner from '@/Components/AttributionBanner.vue';
 import { ref } from 'vue';
 import {
-    Boxes,
-    CalendarClock,
     ChartColumn,
     Eye,
     EyeOff,
     Lock,
     Mail,
-    Package,
+    Receipt,
     ShieldCheck,
+    ShoppingCart,
+    Wallet,
 } from '@lucide/vue';
 
 defineProps({
@@ -29,31 +29,31 @@ const form = useForm({
 const showPassword = ref(false);
 
 const demoAccounts = [
-    { label: 'Admin', email: 'admin@gudangku.test' },
-    { label: 'Staf', email: 'staff@gudangku.test' },
-    { label: 'Viewer', email: 'viewer@gudangku.test' },
+    { label: 'Owner', email: 'owner@kasirku.test' },
+    { label: 'Kasir', email: 'kasir@kasirku.test' },
+    { label: 'Manager', email: 'manager@kasirku.test' },
 ];
 
 const features = [
     {
-        icon: Boxes,
-        title: 'Pelacakan Batch & FEFO',
-        description: 'Alokasi otomatis berdasarkan kedaluwarsa terdekat.',
+        icon: ShoppingCart,
+        title: 'POS Cepat & Mudah',
+        description: 'Scan barcode, cari produk, dan bayar dalam hitungan detik.',
     },
     {
-        icon: CalendarClock,
-        title: 'Peringatan Kedaluwarsa',
-        description: 'Pantau batch yang mendekati masa simpan.',
+        icon: Wallet,
+        title: 'Shift & Kas Harian',
+        description: 'Buka tutup shift dengan perhitungan kas otomatis.',
+    },
+    {
+        icon: Receipt,
+        title: 'Struk & Retur',
+        description: 'Cetak struk thermal, hold bill, dan retur dengan PIN supervisor.',
     },
     {
         icon: ChartColumn,
-        title: 'Laporan Real-time',
-        description: 'Stok, mutasi, dan nilai persediaan selalu akurat.',
-    },
-    {
-        icon: ShieldCheck,
-        title: 'Akses Multi-role',
-        description: 'Admin, staf, dan viewer dengan hak berbeda.',
+        title: 'Laporan Penjualan',
+        description: 'Pantau omzet, produk terlaris, dan stok menipis real-time.',
     },
 ];
 
@@ -86,17 +86,17 @@ const submit = () => {
                 <!-- Logo -->
                 <div class="flex items-center gap-3 mb-12">
                     <div class="w-11 h-11 bg-lime flex items-center justify-center">
-                        <Package class="w-6 h-6 text-ink" />
+                        <ShoppingCart class="w-6 h-6 text-ink" />
                     </div>
-                    <span class="text-2xl font-bold text-lime font-display">GudangKu</span>
+                    <span class="text-2xl font-bold text-lime font-display">KasirKu</span>
                 </div>
 
                 <h1 class="text-4xl xl:text-5xl font-bold text-white font-display leading-tight">
-                    Kendalikan stok gudang
-                    <span class="text-lime">tanpa ribet.</span>
+                    Kelola toko dan kasir
+                    <span class="text-lime">lebih cepat.</span>
                 </h1>
                 <p class="text-white/70 mt-5 max-w-md text-sm leading-relaxed">
-                    Kelola barang masuk, barang keluar, batch, dan kedaluwarsa dalam satu sistem yang rapi dan terpercaya.
+                    Transaksi penjualan, stok, shift kasir, dan laporan dalam satu sistem POS yang rapi dan terpercaya.
                 </p>
 
                 <!-- Features -->
@@ -114,8 +114,8 @@ const submit = () => {
             </div>
 
             <div class="relative border-t border-white/10 pt-6 flex items-center justify-between text-white/40 text-xs">
-                <span>&copy; {{ new Date().getFullYear() }} GudangKu</span>
-                <span>Sistem Inventaris Gudang</span>
+                <span>&copy; {{ new Date().getFullYear() }} KasirKu</span>
+                <span>Sistem POS & Kasir</span>
             </div>
         </div>
 
@@ -125,9 +125,9 @@ const submit = () => {
                 <!-- Mobile logo -->
                 <div class="lg:hidden flex items-center justify-center gap-3 mb-8">
                     <div class="w-10 h-10 bg-ink flex items-center justify-center">
-                        <Package class="w-5 h-5 text-lime" />
+                        <ShoppingCart class="w-5 h-5 text-lime" />
                     </div>
-                    <span class="text-2xl font-bold text-ink font-display">GudangKu</span>
+                    <span class="text-2xl font-bold text-ink font-display">KasirKu</span>
                 </div>
 
                 <!-- Form Card -->
@@ -157,7 +157,7 @@ const submit = () => {
                                 <input
                                     v-model="form.email"
                                     type="email"
-                                    placeholder="admin@gudangku.test"
+                                    placeholder="owner@kasirku.test"
                                     class="w-full h-12 pl-11 pr-4 border-2 border-line text-sm focus:border-ink focus:outline-none"
                                     required
                                     autofocus
@@ -232,7 +232,7 @@ const submit = () => {
                 </div>
 
                 <p class="text-center text-muted text-xs mt-5">
-                    Sistem Inventaris Gudang &middot; GudangKu
+                    Sistem POS & Kasir &middot; KasirKu
                 </p>
             </div>
         </div>

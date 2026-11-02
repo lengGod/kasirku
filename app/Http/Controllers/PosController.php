@@ -9,7 +9,6 @@ use App\Models\Customer;
 use App\Models\HeldSale;
 use App\Models\PaymentMethod;
 use App\Models\Product;
-use App\Models\Sale;
 use App\Models\Setting;
 use App\Services\CheckoutService;
 use App\Services\ShiftService;
@@ -39,6 +38,8 @@ class PosController extends Controller
             'customers' => Customer::query()->orderBy('name')->get(),
             'paymentMethods' => PaymentMethod::query()->where('is_active', true)->orderBy('name')->get(),
             'heldCount' => HeldSale::query()->where('cashier_id', $request->user()->id)->count(),
+            'heldSales' => HeldSale::query()->where('cashier_id', $request->user()->id)->latest()->get(),
+            'resumeCart' => $request->session()->pull('resume_cart'),
             'settings' => [
                 'tax_rate' => (float) Setting::get('tax_rate', '0'),
                 'tax_included' => Setting::get('tax_included', '0') === '1',
@@ -147,6 +148,17 @@ class PosController extends Controller
         $heldSale->delete();
 
         return back()->with('success', 'Bill tertahan dihapus.');
+    }
+
+    public function resume(Request $request, HeldSale $heldSale): RedirectResponse
+    {
+        abort_unless($heldSale->cashier_id === $request->user()->id, 403);
+
+        $cart = $heldSale->cart_json;
+        $heldSale->delete();
+        $request->session()->put('resume_cart', $cart);
+
+        return redirect()->route('pos.index')->with('success', 'Bill dilanjutkan.');
     }
 
     private function productQuery()

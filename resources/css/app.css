@@ -2,6 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+    table:not(.receipt-table) {
+        width: 100%;
+        font-size: 0.875rem;
+    }
+
+    table:not(.receipt-table) thead tr {
+        border-bottom: 2px solid #D5D7E6;
+    }
+
+    table:not(.receipt-table) thead {
+        background-color: transparent !important;
+    }
+
+    table:not(.receipt-table) th {
+        padding: 0.75rem 1rem !important;
+        font-weight: 600 !important;
+        color: #4A4770;
+        text-transform: none !important;
+        font-size: 0.875rem !important;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    table:not(.receipt-table) tbody tr {
+        border-bottom: 1px solid #D5D7E6;
+    }
+
+    table:not(.receipt-table) tbody tr:hover {
+        background-color: #F6F7FB;
+    }
+
+    table:not(.receipt-table) td {
+        padding: 1rem !important;
+        vertical-align: middle;
+    }
+
+    table:not(.receipt-table) th.text-right,
+    table:not(.receipt-table) td.text-right {
+        text-align: right;
+    }
+}
+
 @layer utilities {
     @keyframes slide-in {
         from {

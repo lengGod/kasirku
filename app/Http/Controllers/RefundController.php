@@ -44,7 +44,7 @@ class RefundController extends Controller
         return Inertia::render('Refunds/Create', [
             'sale' => $sale,
             'recentSales' => Sale::query()
-                ->with('customer')
+                ->with(['customer', 'items'])
                 ->whereIn('status', [SaleStatus::Paid->value, SaleStatus::PartialRefund->value])
                 ->latest()
                 ->limit(15)

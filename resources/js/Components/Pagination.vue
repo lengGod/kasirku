@@ -40,17 +40,17 @@ const isNext = (label) => !!label && (label === 'pagination.next' || label.inclu
         <!-- Loading Overlay covering the table container Card -->
         <div
             v-if="loading"
-            class="absolute inset-0 bg-surface/80 backdrop-blur-[1px] flex items-center justify-center z-20"
+            class="absolute inset-0 z-20 flex items-center justify-center bg-ink/10 backdrop-blur-[1px]"
             role="status"
             aria-live="polite"
         >
-            <div class="bg-surface border-2 border-ink shadow-hard px-6 py-4 flex items-center gap-3">
-                <LoaderCircle class="w-6 h-6 text-violet-text animate-spin" />
-                <p class="text-xs font-semibold text-ink tracking-wide">Memuat data...</p>
+            <div class="flex items-center gap-3 border-2 border-ink bg-surface px-6 py-4 shadow-hard">
+                <LoaderCircle class="h-6 w-6 animate-spin text-violet-text" />
+                <p class="text-xs font-semibold tracking-wide text-ink">Memuat halaman...</p>
             </div>
         </div>
 
-        <div v-if="paginator.total > paginator.per_page" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6">
+        <div v-if="paginator.total > paginator.per_page" class="flex flex-col gap-3 border-t-2 border-line px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-xs text-muted">
                 Menampilkan {{ paginator.from ?? 0 }}–{{ paginator.to ?? 0 }} dari {{ paginator.total }} data
             </p>

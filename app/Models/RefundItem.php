@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RefundItem extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = ['refund_id', 'sale_item_id', 'qty', 'amount', 'restock'];
 
     protected $casts = [

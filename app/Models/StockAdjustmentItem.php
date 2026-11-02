@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StockAdjustmentItem extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = ['stock_adjustment_id', 'product_id', 'qty_before', 'qty_after', 'difference'];
 
     protected $casts = [

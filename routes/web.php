@@ -7,6 +7,7 @@ use App\Http\Controllers\LabelController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\ReportController;
@@ -23,6 +24,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard/search', [DashboardController::class, 'search'])->middleware(['auth', 'verified'])->name('dashboard.search');
 
 Route::middleware('auth')->group(function () {
     // Layar Kasir (POS)
@@ -33,6 +35,7 @@ Route::middleware('auth')->group(function () {
         Route::post('checkout', [PosController::class, 'checkout'])->name('checkout');
         Route::get('held', [PosController::class, 'held'])->name('held');
         Route::post('hold', [PosController::class, 'hold'])->name('hold');
+        Route::post('held/{heldSale}/resume', [PosController::class, 'resume'])->name('resume');
         Route::delete('held/{heldSale}', [PosController::class, 'destroyHeld'])->name('held.destroy');
     });
 
@@ -119,9 +122,9 @@ Route::middleware('auth')->group(function () {
     });
 
     // Profil
-    Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

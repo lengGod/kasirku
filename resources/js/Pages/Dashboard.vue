@@ -1,212 +1,199 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Card from '@/Components/Card.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import { Head } from '@inertiajs/vue3';
-import { usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
-import { formatDateLong, formatDateShort, formatNumber } from '@/Utils/format';
-import { useAuthorization } from '@/Utils/authorization';
-import MovementChart from '@/Components/MovementChart.vue';
-import { ChartColumn, Clock, Package, TrendingUp, TriangleAlert, Wallet } from '@lucide/vue';
+import { Head, Link } from '@inertiajs/vue3';
+import { formatRupiah, formatNumber } from '@/Utils/format';
+import { ChartColumn, ShoppingCart, Wallet, Package, TrendingUp } from '@lucide/vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 
-const page = usePage();
-const { can } = useAuthorization();
-const user = computed(() => page.props.auth.user);
-const stats = computed(() => page.props.stats);
-const expiringBatches = computed(() => page.props.expiringBatches);
-const lowStockItems = computed(() => page.props.lowStockItems);
-const recentMovements = computed(() => page.props.recentMovements);
-const movementChart = computed(() => page.props.movementChart ?? { labels: [], in: [], out: [] });
+const props = defineProps({
+    summary: Object,
+    chart: Array,
+    topProducts: Array,
+    lowStock: Array,
+    openShift: Object,
+    recentSales: Array,
+});
 
-const cardTone = (color) => ({
-    lime: 'lime',
-    'violet-text': 'violet',
-    'yellow-400': 'yellow',
-    'red-400': 'red',
-}[color] || 'lime');
+const globalSearch = ref('');
+const globalResults = ref([]);
+let globalSearchTimer;
 
-const cardTextClasses = (color) => ({
-    lime: 'text-ink',
-    'violet-text': 'text-white',
-    'yellow-400': 'text-ink',
-    'red-400': 'text-ink',
-}[color] || 'text-ink');
+const runGlobalSearch = async () => {
+    const search = globalSearch.value.trim();
 
-const cardLabelClasses = (color) => ({
-    lime: 'text-ink/70',
-    'violet-text': 'text-white/80',
-    'yellow-400': 'text-ink/70',
-    'red-400': 'text-ink/70',
-}[color] || 'text-ink/70');
+    if (!search) {
+        globalResults.value = [];
+        return;
+    }
 
-const cardAccentClasses = (color) => ({
-    lime: 'bg-ink',
-    'violet-text': 'bg-white',
-    'yellow-400': 'bg-ink',
-    'red-400': 'bg-ink',
-}[color] || 'bg-ink');
+    const response = await fetch(`${route('dashboard.search')}?search=${encodeURIComponent(search)}`, {
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+    });
 
-const iconMap = {
-    package: Package,
-    wallet: Wallet,
-    alert: TriangleAlert,
-    clock: Clock,
-    trending: TrendingUp,
-    chart: ChartColumn,
+    if (response.ok) {
+        globalResults.value = (await response.json()).results ?? [];
+    }
 };
 
-const getIcon = (iconName) => iconMap[iconName] || Package;
+watch(globalSearch, () => {
+    clearTimeout(globalSearchTimer);
+    globalSearchTimer = setTimeout(runGlobalSearch, 50);
+});
 
-const valueClasses = (value) => (String(value).length > 9 ? 'text-2xl sm:text-3xl' : 'text-4xl');
+onUnmounted(() => clearTimeout(globalSearchTimer));
 
-const getMovementTypeLabel = (type) => {
-    const labels = {
-        'in': 'Masuk',
-        'out': 'Keluar',
-        'adjust': 'Penyesuaian',
-    };
-    return labels[type] || type;
+const chartRows = computed(() => (Array.isArray(props.chart) ? props.chart : []).map((row) => ({
+    ...row,
+    total: Number(row.total) || 0,
+})));
+
+const chartMin = computed(() => chartRows.value.length ? Math.min(...chartRows.value.map((row) => row.total)) : 0);
+const chartMax = computed(() => chartRows.value.length ? Math.max(...chartRows.value.map((row) => row.total)) : 1);
+const chartBarHeight = (total) => {
+    const range = chartMax.value - chartMin.value;
+
+    return range > 0 ? Math.round(18 + ((total - chartMin.value) / range) * 122) : 70;
 };
-
-const getMovementTypeColor = (type) => {
-    const colors = {
-        'in': 'text-lime',
-        'out': 'text-red-400',
-        'adjust': 'text-yellow-400',
-    };
-    return colors[type] || 'text-ink';
-};
+const growthLabel = computed(() => {
+    if (props.summary.growth === null) return 'Belum ada pembanding';
+    return `${props.summary.growth > 0 ? '+' : ''}${props.summary.growth}% vs kemarin`;
+});
 </script>
 
 <template>
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
-        <div class="bg-canvas min-h-screen py-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                    <div>
-                        <p class="text-muted text-sm">Selamat pagi</p>
-                        <h1 class="text-display font-bold text-3xl sm:text-4xl text-ink">{{ user.name }}</h1>
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <PageHeader title="Dashboard" subtitle="Ringkasan penjualan dan operasional toko hari ini.">
+                <template #actions>
+                    <div class="relative flex flex-wrap justify-end gap-2">
+                        <form class="flex w-full sm:w-80" @submit.prevent="runGlobalSearch">
+                            <input v-model="globalSearch" type="search" placeholder="Cari produk, pelanggan, struk..." class="h-12 min-w-0 flex-1 border-2 border-ink bg-surface px-3 text-sm text-ink focus:outline-none" />
+                            <button type="submit" class="h-12 border-2 border-l-0 border-ink bg-ink px-4 text-xs font-bold text-white hover:bg-ink-3">Cari</button>
+                        </form>
+                        <div v-if="globalSearch.trim()" class="absolute right-0 top-14 z-30 w-full border-2 border-ink bg-surface p-2 text-left shadow-hard sm:w-80">
+                            <Link v-for="result in globalResults" :key="result.type + result.url" :href="result.url" class="flex items-center justify-between gap-3 border-b border-line px-3 py-2 last:border-0 hover:bg-surface-2">
+                                <span class="min-w-0"><span class="block truncate text-sm font-semibold text-ink">{{ result.label }}</span><span class="block truncate text-xs text-muted">{{ result.meta }}</span></span>
+                                <span class="shrink-0 text-[10px] font-bold uppercase text-violet-text">{{ result.type }}</span>
+                            </Link>
+                            <p v-if="!globalResults.length" class="px-3 py-3 text-xs text-muted">Tidak ada hasil ditemukan.</p>
+                        </div>
+                        <PrimaryButton as="link" :href="route('pos.index')"><ShoppingCart class="h-4 w-4" /> Buka POS</PrimaryButton>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        <SecondaryButton class="w-full sm:w-auto">Pencarian Global</SecondaryButton>
-                        <PrimaryButton v-if="can('manage_transactions')" as="link" :href="route('stock-ins.create')" class="w-full sm:w-auto">+ Barang Masuk</PrimaryButton>
+                </template>
+            </PageHeader>
+
+            <div v-if="!openShift" class="mb-6 border-2 border-ink bg-warn-bg p-4 text-sm text-warn-fg">
+                Shift belum dibuka. Buka shift dulu sebelum transaksi.
+                <a :href="route('shifts.open')" class="ml-2 font-bold underline">Buka shift</a>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="relative border-2 border-ink bg-lime p-5 shadow-hard">
+                    <div class="mb-3 flex items-start justify-between">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.15em] text-ink/80">Penjualan Hari Ini</p>
+                        <Wallet class="h-5 w-5 text-ink" />
                     </div>
+                    <p class="font-display text-3xl font-bold text-ink">{{ formatRupiah(summary.today_total) }}</p>
+                    <p class="mt-2 text-xs text-ink/70">{{ growthLabel }}</p>
                 </div>
 
-                <!-- Stat Cards Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <Card v-for="(stat, idx) in stats" :key="idx" :tone="cardTone(stat.color)" class="flex flex-col justify-between relative overflow-hidden group hover:shadow-hard transition">
-                        <!-- Background accent -->
-                        <div :class="['absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-10 group-hover:opacity-20 transition', cardAccentClasses(stat.color)]"></div>
-
-                        <div class="relative z-10">
-                            <div :class="['text-xs font-semibold mb-3 flex items-center gap-2', cardLabelClasses(stat.color)]">
-                                <component :is="getIcon(stat.icon)" class="w-4 h-4" />
-                                {{ stat.label }}
-                            </div>
-                            <div :class="['font-bold font-display leading-tight', cardTextClasses(stat.color), valueClasses(stat.value)]">{{ stat.value }}</div>
-                        </div>
-                    </Card>
+                <div class="relative border-2 border-ink bg-surface p-5 shadow-hard">
+                    <div class="mb-3 flex items-start justify-between">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.15em] text-muted">Transaksi</p>
+                        <ShoppingCart class="h-5 w-5 text-violet-text" />
+                    </div>
+                    <p class="font-display text-3xl font-bold text-ink">{{ formatNumber(summary.today_count, 0) }}</p>
+                    <p class="mt-2 text-xs text-muted">Rata-rata {{ formatRupiah(summary.today_average) }}</p>
                 </div>
 
-                <!-- Charts & Quick Lists -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <!-- Grafik Masuk vs Keluar -->
-                    <Card tone="lime-soft" class="relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-lime"></div>
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="w-5 h-5 text-lime"><component :is="getIcon('trending')" class="w-5 h-5" /></span>
-                            <h2 class="text-xl font-bold text-ink font-display">Masuk vs Keluar (30 hari)</h2>
-                        </div>
-                        <div class="bg-surface border-2 border-line p-3">
-                            <MovementChart
-                                :labels="movementChart.labels"
-                                :in-data="movementChart.in"
-                                :out-data="movementChart.out"
-                            />
-                        </div>
-                    </Card>
-
-                    <!-- Segera Kedaluwarsa -->
-                    <Card tone="red-soft" class="relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="flex items-center gap-2">
-                                <span class="w-5 h-5 text-red-400"><component :is="getIcon('clock')" class="w-5 h-5" /></span>
-                                <h2 class="text-xl font-bold text-ink font-display">Segera Kedaluwarsa</h2>
-                            </div>
-                            <a href="#" class="text-violet-text text-sm font-semibold hover:underline">Lihat semua</a>
-                        </div>
-                        <div v-if="expiringBatches.length === 0" class="text-muted text-sm py-8 text-center">
-                            <component :is="getIcon('package')" class="w-8 h-8 mx-auto mb-2" />
-                            Belum ada batch yang mendekati kedaluwarsa. Bagus!
-                        </div>
-                        <div v-else class="space-y-2">
-                            <div v-for="batch in expiringBatches" :key="batch.batch" class="flex justify-between items-center p-3 bg-surface rounded border-l-2 border-red-400">
-                                <div>
-                                    <p class="text-sm font-semibold text-ink">{{ batch.product }}</p>
-                                    <p class="text-xs text-muted">{{ batch.batch }}</p>
-                                </div>
-                                <span :class="['text-sm font-semibold', batch.daysLeft <= 7 ? 'text-red-400' : 'text-muted']">{{ formatDateLong(batch.expiry_date) }}</span>
-                            </div>
-                        </div>
-                    </Card>
+                <div class="relative border-2 border-ink bg-surface p-5 shadow-hard">
+                    <div class="mb-3 flex items-start justify-between">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.15em] text-muted">Kemarin</p>
+                        <TrendingUp class="h-5 w-5 text-violet-text" />
+                    </div>
+                    <p class="font-display text-3xl font-bold text-ink">{{ formatRupiah(summary.yesterday_total) }}</p>
+                    <p class="mt-2 text-xs text-muted">Total penjualan kemarin</p>
                 </div>
 
-                <!-- Low Stock & Recent Movements -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Stok Menipis -->
-                    <Card tone="yellow-soft" class="relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-yellow-400"></div>
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="w-5 h-5 text-yellow-400"><component :is="getIcon('alert')" class="w-5 h-5" /></span>
-                            <h2 class="text-xl font-bold text-ink font-display">Stok Menipis</h2>
-                        </div>
-                        <div v-if="lowStockItems.length === 0" class="text-muted text-sm py-8 text-center">
-                            <component :is="getIcon('package')" class="w-8 h-8 mx-auto mb-2" />
-                            Tidak ada barang dengan stok menipis
-                        </div>
-                        <div v-else class="space-y-2">
-                            <div v-for="item in lowStockItems" :key="item.name" class="flex justify-between items-center p-3 bg-surface rounded border-l-2 border-yellow-400">
-                                <div>
-                                    <p class="text-sm font-semibold text-ink">{{ item.name }}</p>
-                                    <p class="text-xs text-muted">{{ formatNumber(item.current) }} / {{ formatNumber(item.minimum) }} unit</p>
-                                </div>
-                                <span class="text-red-400 font-bold text-sm">-{{ item.shortage }}</span>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <!-- Mutasi Terbaru -->
-                    <Card tone="violet-soft" class="relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-violet-text"></div>
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="w-5 h-5 text-violet-text"><component :is="getIcon('chart')" class="w-5 h-5" /></span>
-                            <h2 class="text-xl font-bold text-ink font-display">Mutasi Terbaru</h2>
-                        </div>
-                        <div v-if="recentMovements.length === 0" class="text-muted text-sm py-8 text-center">
-                            <component :is="getIcon('package')" class="w-8 h-8 mx-auto mb-2" />
-                            Belum ada transaksi
-                        </div>
-                        <div v-else class="space-y-2">
-                            <div v-for="(movement, idx) in recentMovements" :key="idx" class="flex justify-between items-center p-3 bg-surface rounded border-l-2 border-violet-text">
-                                <div>
-                                    <p class="text-sm font-semibold text-ink">{{ movement.product }}</p>
-                                    <p :class="['text-xs', getMovementTypeColor(movement.type)]">{{ getMovementTypeLabel(movement.type) }}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-semibold text-ink">{{ formatNumber(movement.quantity) }}</p>
-                                    <p class="text-xs text-muted">{{ formatDateShort(movement.date) }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
+                <div class="relative border-2 border-ink bg-ink p-5 shadow-hard">
+                    <div class="mb-3 flex items-start justify-between">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.15em] text-lime">Shift</p>
+                        <Package class="h-5 w-5 text-lime" />
+                    </div>
+                    <p class="font-display text-2xl font-bold text-white">{{ openShift ? 'Terbuka' : 'Tertutup' }}</p>
+                    <p class="mt-2 text-xs text-white/60">
+                        {{ openShift ? 'Mulai ' + new Date(openShift.opened_at).toLocaleTimeString('id-ID') : 'Buka shift untuk mulai jualan' }}
+                    </p>
                 </div>
+            </div>
+
+            <div class="mt-6 grid gap-6 lg:grid-cols-3">
+                <Card class="lg:col-span-2">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="font-display text-lg font-bold text-ink">Penjualan 7 Hari</h2>
+                        <ChartColumn class="h-5 w-5 text-violet-text" />
+                    </div>
+                    <div v-if="chartRows.length" class="flex h-48 items-end gap-3">
+                        <div v-for="row in chartRows" :key="row.label" class="flex min-w-0 flex-1 flex-col items-center gap-2">
+                            <div class="flex h-40 w-full items-end">
+                                <div class="w-full bg-violet-text transition-all" :style="{ height: `${chartBarHeight(row.total)}px` }" :title="formatRupiah(row.total)"></div>
+                            </div>
+                            <p class="text-[9px] font-bold text-violet-text">{{ formatRupiah(row.total) }}</p>
+                            <p class="text-[10px] font-semibold text-muted">{{ row.label }}</p>
+                        </div>
+                    </div>
+                    <p v-else class="py-16 text-center text-sm text-muted">Belum ada data penjualan.</p>
+                </Card>
+
+                <Card>
+                    <h2 class="mb-4 font-display text-lg font-bold text-ink">Produk Terlaris</h2>
+                    <div v-if="topProducts.length" class="space-y-3">
+                        <div v-for="(product, index) in topProducts" :key="product.product_id" class="flex items-center gap-3 border-b border-line pb-3 last:border-0 last:pb-0">
+                            <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center bg-ink text-xs font-bold text-lime">{{ index + 1 }}</span>
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-semibold text-ink">{{ product.name }}</p>
+                                <p class="text-xs text-muted">{{ formatNumber(product.qty, 0) }} terjual</p>
+                            </div>
+                            <p class="text-xs font-bold text-ink">{{ formatRupiah(product.total) }}</p>
+                        </div>
+                    </div>
+                    <p v-else class="text-sm text-muted">Belum ada penjualan.</p>
+                </Card>
+            </div>
+
+            <div class="mt-6 grid gap-6 lg:grid-cols-2">
+                <Card>
+                    <h2 class="mb-4 font-display text-lg font-bold text-ink">Stok Menipis</h2>
+                    <div v-if="lowStock.length" class="space-y-3">
+                        <div v-for="product in lowStock" :key="product.id" class="flex items-center justify-between gap-3 border-b border-line pb-3 last:border-0 last:pb-0">
+                            <div>
+                                <p class="text-sm font-semibold text-ink">{{ product.name }}</p>
+                                <p class="text-xs text-muted">{{ product.category?.name }} · {{ product.unit?.short_name }}</p>
+                            </div>
+                            <span class="bg-bad-bg px-3 py-1 text-xs font-bold text-bad-fg">{{ formatNumber(product.stock_quantity, 0) }}</span>
+                        </div>
+                    </div>
+                    <p v-else class="text-sm text-muted">Semua stok aman.</p>
+                </Card>
+
+                <Card>
+                    <h2 class="mb-4 font-display text-lg font-bold text-ink">Transaksi Terakhir</h2>
+                    <div v-if="recentSales.length" class="space-y-3">
+                        <a v-for="sale in recentSales" :key="sale.id" :href="route('sales.show', sale.id)" class="flex items-center justify-between gap-3 border-b border-line pb-3 last:border-0 last:pb-0 hover:text-violet-text">
+                            <div>
+                                <p class="text-sm font-semibold text-ink">{{ sale.invoice_number }}</p>
+                                <p class="text-xs text-muted">{{ sale.cashier?.name }} · {{ sale.customer?.name ?? 'Umum' }}</p>
+                            </div>
+                            <p class="text-sm font-bold text-ink">{{ formatRupiah(sale.grand_total) }}</p>
+                        </a>
+                    </div>
+                    <p v-else class="text-sm text-muted">Belum ada transaksi.</p>
+                </Card>
             </div>
         </div>
     </AuthenticatedLayout>

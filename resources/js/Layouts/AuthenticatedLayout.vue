@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { ChevronDown, Menu, ScanBarcode, UserRound, X } from '@lucide/vue';
+import { ChevronDown, Menu, ScanBarcode, UserRound, X, ShoppingCart, RefreshCcw, History, LayoutDashboard, Settings, Users, Package } from '@lucide/vue';
 import AttributionBanner from '@/Components/AttributionBanner.vue';
 import FlashMessage from '@/Components/FlashMessage.vue';
 import { useAuthorization } from '@/Utils/authorization';
@@ -16,31 +16,42 @@ const showMobileMenu = ref(false);
 const mobileOpenGroup = ref(null);
 
 const navigation = [
-    { label: 'Dashboard', route: 'dashboard', direct: true },
+    { label: 'Dashboard', route: 'dashboard', icon: LayoutDashboard, direct: true },
+    { label: 'POS Kasir', route: 'pos.index', icon: ShoppingCart, direct: true },
+    {
+        label: 'Penjualan',
+        items: [
+            { label: 'Riwayat Penjualan', route: 'sales.index', match: 'sales.*' },
+            { label: 'Retur', route: 'refunds.index', match: 'refunds.*' },
+        ]
+    },
+    {
+        label: 'Stok',
+        items: [
+            { label: 'Penerimaan', route: 'stock.receive.index', match: 'stock.receive.*' },
+            { label: 'Penyesuaian', route: 'stock.adjust.index', match: 'stock.adjust.*' },
+            { label: 'Riwayat Stok', route: 'stock.movements', match: 'stock.movements' },
+        ]
+    },
     {
         label: 'Master Data',
+        ability: 'manage_master_data',
         items: [
-            { label: 'Barang', route: 'products.index', match: 'products.*' },
+            { label: 'Produk', route: 'products.index', match: 'products.*' },
             { label: 'Kategori', route: 'categories.index', match: 'categories.*' },
             { label: 'Satuan', route: 'units.index', match: 'units.*' },
-            { label: 'Supplier', route: 'suppliers.index', match: 'suppliers.*' },
-            { label: 'Lokasi', route: 'locations.index', match: 'locations.*' },
+            { label: 'Pelanggan', route: 'customers.index', match: 'customers.*' },
+            { label: 'Pembayaran', route: 'payment-methods.index', match: 'payment-methods.*' },
+            { label: 'Promo', route: 'promotions.index', match: 'promotions.*' },
         ]
     },
     {
-        label: 'Transaksi',
+        label: 'Manajemen',
         items: [
-            { label: 'Barang Masuk', route: 'stock-ins.index', match: 'stock-ins.*' },
-            { label: 'Barang Keluar', route: 'stock-outs.index', match: 'stock-outs.*' },
-            { label: 'Penyesuaian Stok', route: 'stock-adjustments.index', match: 'stock-adjustments.*' },
-        ]
-    },
-    {
-        label: 'Inventori',
-        items: [
-            { label: 'Batch & Kedaluwarsa', route: 'batches.index', match: 'batches.*' },
-            { label: 'Scan & Label', route: 'scan-label.index', match: 'scan-label.*', ability: 'print_labels' },
-            { label: 'Laporan', route: 'reports.index', match: 'reports.*' },
+            { label: 'Laporan', route: 'reports.index', match: 'reports.*', ability: 'view_reports' },
+            { label: 'Shift Kasir', route: 'shifts.index', match: 'shifts.*' },
+            { label: 'Pengguna', route: 'users.index', match: 'users.*', ability: 'manage_users' },
+            { label: 'Pengaturan', route: 'settings.store', match: 'settings.*', ability: 'manage_settings' },
         ]
     },
 ];
@@ -49,6 +60,7 @@ const visibleNavigation = computed(() => navigation
     .map((group) => group.items
         ? { ...group, items: group.items.filter((item) => !item.ability || can(item.ability)) }
         : group)
+    .filter((group) => !group.ability || can(group.ability))
     .filter((group) => group.direct || group.items.length > 0));
 
 const toggleDropdown = (label) => {
@@ -77,7 +89,6 @@ const isDropdownActive = (dropdownItems) => {
     return dropdownItems.some((item) => isItemActive(item));
 };
 
-// Lock scroll when mobile menu open
 watch(showMobileMenu, (val) => {
     document.body.style.overflow = val ? 'hidden' : '';
 });
@@ -93,28 +104,26 @@ watch(showMobileMenu, (val) => {
         <!-- Topbar -->
         <nav class="fixed top-9 left-0 right-0 h-16 bg-ink flex items-center px-4 sm:px-6 z-50 shadow-hard">
             <div class="flex items-center justify-between w-full max-w-full gap-2">
-                <!-- Left: Hamburger + Logo -->
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <!-- Hamburger (mobile) -->
                     <button @click="showMobileMenu = true" class="lg:hidden text-white hover:text-lime transition p-2 -ml-2" aria-label="Buka menu">
                         <Menu class="w-6 h-6" />
                     </button>
 
                     <Link :href="route('dashboard')" class="text-lime font-bold text-lg sm:text-xl font-display hover:text-yellow-300 transition flex-shrink-0">
-                        GudangKu
+                        KasirKu
                     </Link>
                 </div>
 
-                <!-- Navigation - Desktop Center -->
-                <div class="hidden lg:flex gap-6 flex-1 justify-center ml-16">
+                <div class="hidden lg:flex gap-1 flex-1 justify-center ml-4">
                     <Link v-for="item in visibleNavigation.filter(n => n.direct)" :key="item.label" :href="route(item.route)" 
-                        :class="['px-3 py-2 text-white text-sm font-semibold hover:text-lime hover:bg-ink-3 transition whitespace-nowrap', route().current(item.route) ? 'text-lime border-b-2 border-lime' : '']">
+                        :class="['px-3 py-2 text-white text-sm font-semibold hover:text-lime hover:bg-ink-3 transition flex items-center gap-2', route().current(item.route) ? 'text-lime border-b-2 border-lime' : '']">
+                        <component :is="item.icon" class="w-4 h-4" />
                         {{ item.label }}
                     </Link>
 
                     <div v-for="item in visibleNavigation.filter(n => !n.direct)" :key="item.label" class="relative z-50">
                         <button @click="toggleDropdown(item.label)" 
-                            :class="['px-3 py-2 text-white text-sm font-semibold hover:text-lime transition flex items-center gap-1 whitespace-nowrap hover:border-b-2 hover:border-lime', activeDropdown === item.label || isDropdownActive(item.items) ? 'text-lime border-b-2 border-lime' : 'border-b-2 border-transparent']">
+                            :class="['px-3 py-2 text-white text-sm font-semibold hover:text-lime transition flex items-center gap-1 hover:border-b-2 hover:border-lime', activeDropdown === item.label || isDropdownActive(item.items) ? 'text-lime border-b-2 border-lime' : 'border-b-2 border-transparent']">
                             {{ item.label }}
                             <ChevronDown :class="['w-4 h-4 transition', activeDropdown === item.label ? 'rotate-180' : '']" />
                         </button>
@@ -129,29 +138,20 @@ watch(showMobileMenu, (val) => {
                     </div>
                 </div>
 
-                <!-- Right Actions -->
-                <div class="flex items-center gap-1 sm:gap-4 ml-auto">
-                    <Link
-                        v-if="can('print_labels')"
-                        :href="route('scan-label.index')"
-                        class="hidden md:inline-flex items-center justify-center gap-2 h-12 px-6 text-xs font-semibold text-ink bg-lime hover:bg-yellow-400 transition whitespace-nowrap"
-                    >
-                        <ScanBarcode class="w-4 h-4" />
-                        Scan &amp; Label
-                    </Link>
-
+                <div class="flex items-center gap-1 ml-auto">
                     <div class="relative">
                         <button @click="showProfileMenu = !showProfileMenu" 
-                            :class="['flex items-center gap-2 px-2 sm:px-3 py-2 text-white hover:text-lime transition text-sm font-semibold', showProfileMenu ? 'text-lime' : '']">
+                            :class="['flex items-center gap-2 px-3 py-2 text-white hover:text-lime transition text-sm font-semibold', showProfileMenu ? 'text-lime' : '']">
                             <UserRound class="w-5 h-5" />
-                            <span class="hidden sm:inline">{{ user.name }}</span>
                         </button>
 
                         <div v-if="showProfileMenu" class="absolute right-0 top-full mt-1 w-48 bg-surface border-2 border-ink shadow-hard z-50 py-1">
                             <div class="px-6 py-3 border-b border-line">
-                                <p class="text-[10px] font-semibold uppercase tracking-wide text-muted">Masuk sebagai</p>
-                                <p class="text-xs font-semibold text-ink">{{ roleLabel }}</p>
+                                <p class="text-[10px] font-semibold uppercase tracking-wide text-muted">User</p>
+                                <p class="text-xs font-semibold text-ink truncate">{{ user.name }}</p>
+                                <p class="text-lime/80 text-[10px] font-semibold">{{ roleLabel }}</p>
                             </div>
+                            <Link :href="route('profile.edit')" @click="closeMenus" class="block px-6 py-3 text-sm text-ink hover:bg-surface-2">Profil</Link>
                             <Link :href="route('logout')" method="post" as="button" @click="closeMenus" 
                                 class="w-full text-left px-6 py-3 text-sm text-ink hover:bg-surface-2">
                                 Keluar
@@ -162,10 +162,9 @@ watch(showMobileMenu, (val) => {
             </div>
         </nav>
 
-        <!-- Click outside to close dropdowns -->
         <div v-if="activeDropdown || showProfileMenu" @click="closeMenus" class="fixed inset-0 z-40 mt-[6.25rem]"></div>
 
-        <!-- Mobile Drawer -->
+        <!-- Mobile Drawer Overlay -->
         <Transition
             enter-active-class="transition-opacity duration-200"
             enter-from-class="opacity-0"
@@ -175,6 +174,7 @@ watch(showMobileMenu, (val) => {
             <div v-if="showMobileMenu" class="lg:hidden fixed inset-0 z-[9998] bg-black/50" @click="closeMobileMenu"></div>
         </Transition>
 
+        <!-- Mobile Drawer Panel -->
         <Transition
             enter-active-class="transition-transform duration-300 ease-out"
             enter-from-class="-translate-x-full"
@@ -185,7 +185,7 @@ watch(showMobileMenu, (val) => {
                 <!-- Drawer Header -->
                 <div class="h-16 flex items-center justify-between px-4 border-b border-ink-3 flex-shrink-0">
                     <Link :href="route('dashboard')" @click="closeMobileMenu" class="text-lime font-bold text-xl font-display">
-                        GudangKu
+                        KasirKu
                     </Link>
                     <button @click="closeMobileMenu" class="text-white hover:text-lime transition p-2 -mr-2" aria-label="Tutup menu">
                         <X class="w-6 h-6" />
@@ -231,8 +231,7 @@ watch(showMobileMenu, (val) => {
             </aside>
         </Transition>
 
-        <!-- Page Content -->
-        <div class="mt-[6.25rem] bg-canvas min-h-screen overflow-visible">
+        <div class="mt-[6.25rem] bg-canvas min-h-screen">
             <slot />
         </div>
     </div>

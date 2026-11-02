@@ -3,7 +3,7 @@ defineProps({
     status: {
         type: String,
         required: true,
-        validator: (v) => ['ok', 'warn', 'bad', 'info', 'adj', 'active', 'near_expiry', 'expired', 'depleted'].includes(v),
+        validator: (v) => ['ok', 'warn', 'bad', 'info', 'adj', 'active', 'near_expiry', 'expired', 'depleted', 'paid', 'voided', 'refunded', 'partial_refund'].includes(v),
     },
 });
 
@@ -17,11 +17,15 @@ const colorMap = {
     near_expiry: { bg: 'bg-yellow-400/10', fg: 'text-yellow-400' },
     expired: { bg: 'bg-red-400/10', fg: 'text-red-400' },
     depleted: { bg: 'bg-surface-2', fg: 'text-muted' },
+    paid: { bg: 'bg-ok-bg', fg: 'text-ok-fg' },
+    voided: { bg: 'bg-bad-bg', fg: 'text-bad-fg' },
+    refunded: { bg: 'bg-info-bg', fg: 'text-info-fg' },
+    partial_refund: { bg: 'bg-adj-bg', fg: 'text-adj-fg' },
 };
 </script>
 
 <template>
-    <span :class="[colorMap[status].bg, colorMap[status].fg, 'px-3 py-1 text-xs font-semibold inline-block']">
+    <span :class="[(colorMap[status] ?? colorMap.info).bg, (colorMap[status] ?? colorMap.info).fg, 'px-3 py-1 text-xs font-semibold inline-block']">
         <slot />
     </span>
 </template>
