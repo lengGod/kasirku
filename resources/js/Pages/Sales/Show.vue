@@ -50,7 +50,7 @@ const submitVoid = () => {
             </PageHeader>
 
             <Card tone="surface">
-                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-wide text-muted">No. Struk</p>
                         <p class="font-display text-2xl font-bold text-ink">{{ sale.invoice_number }}</p>
@@ -112,7 +112,7 @@ const submitVoid = () => {
                 </div>
             </Card>
 
-            <div class="mt-6 grid gap-6 sm:grid-cols-2">
+            <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <Card tone="surface">
                     <h2 class="mb-4 font-display text-lg font-bold text-ink">Pembayaran</h2>
                     <div class="space-y-2">
@@ -151,7 +151,7 @@ const submitVoid = () => {
                     <AlertTriangle class="h-5 w-5" />
                     <h2 class="font-display text-lg font-bold">Void Transaksi</h2>
                 </div>
-                <form class="grid gap-3 sm:grid-cols-[1fr_180px_auto]" @submit.prevent="submitVoid">
+                <form class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_auto]" @submit.prevent="submitVoid">
                     <div>
                         <FormInput v-model="voidForm.reason" required placeholder="Alasan void (min. 5 karakter)" />
                         <p v-if="voidForm.errors.reason" class="mt-1 text-xs font-semibold text-bad-fg">{{ voidForm.errors.reason }}</p>

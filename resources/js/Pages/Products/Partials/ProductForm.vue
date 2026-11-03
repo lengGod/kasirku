@@ -41,7 +41,7 @@ const submit = () => {
 
 <template>
     <form class="space-y-6" @submit.prevent="submit">
-        <div class="grid gap-4 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
                 <label class="mb-1 block text-sm font-semibold text-ink">SKU <span class="text-bad-fg">*</span></label>
                 <FormInput v-model="form.sku" required placeholder="MKN-001" />

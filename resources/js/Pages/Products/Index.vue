@@ -57,7 +57,7 @@ const destroy = () => {
                 </template>
             </PageHeader>
 
-            <div class="mb-4 grid gap-3 border-2 border-ink bg-surface p-4 sm:grid-cols-[1fr_200px_auto]">
+            <div class="mb-4 grid grid-cols-1 gap-3 border-2 border-ink bg-surface p-4 sm:grid-cols-[1fr_200px_auto]">
                 <div class="relative">
                     <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                     <input v-model="search" type="text" placeholder="Cari nama, SKU, barcode..." class="h-12 w-full border-2 border-ink bg-surface pl-10 pr-4 text-sm focus:border-violet-text focus:outline-none" />

@@ -50,7 +50,7 @@ const submit = () => {
             </PageHeader>
 
             <form class="space-y-4 border-2 border-ink bg-surface p-5 shadow-hard" @submit.prevent="submit">
-                <div class="grid gap-3 sm:grid-cols-3">
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                     <div>
                         <label class="mb-1 block text-sm font-semibold">Supplier</label>
                         <FormInput v-model="form.supplier_name" placeholder="Nama supplier" />
@@ -73,7 +73,7 @@ const submit = () => {
                         </button>
                     </div>
 
-                    <div v-for="(item, index) in form.items" :key="index" class="grid gap-2 border-2 border-line p-3 sm:grid-cols-[1fr_120px_140px_auto]">
+                    <div v-for="(item, index) in form.items" :key="index" class="grid grid-cols-1 gap-2 border-2 border-line p-3 sm:grid-cols-[1fr_120px_140px_auto]">
                         <FormSelect v-model="item.product_id" required @change="onProductChange(index)">
                             <option value="">Pilih produk</option>
                             <option v-for="product in products" :key="product.id" :value="product.id">{{ product.name }} ({{ product.unit?.short_name }})</option>

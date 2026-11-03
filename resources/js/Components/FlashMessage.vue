@@ -46,23 +46,23 @@ onUnmounted(() => {
 <template>
     <Teleport to="body">
         <!-- Success Toast -->
-        <div v-if="showSuccess" class="fixed top-28 right-6 z-[9999] animate-slide-in">
-            <div class="bg-lime/95 border-2 border-lime text-ink px-6 py-4 rounded shadow-hard flex items-center gap-3 min-w-[300px] max-w-md">
-                <CircleCheck class="w-5 h-5 flex-shrink-0" />
-                <span class="text-sm font-semibold">{{ successMessage }}</span>
-                <button @click="showSuccess = false" class="ml-auto text-ink hover:text-lime transition">
-                    <X class="w-4 h-4" />
+        <div v-if="showSuccess" class="fixed left-4 right-4 top-28 z-[9999] animate-slide-in sm:left-auto sm:right-6">
+            <div class="flex w-full items-center gap-3 rounded border-2 border-lime bg-lime/95 px-4 py-4 text-ink shadow-hard sm:w-auto sm:min-w-[300px] sm:max-w-md">
+                <CircleCheck class="h-5 w-5 flex-shrink-0" />
+                <span class="min-w-0 flex-1 break-words text-sm font-semibold">{{ successMessage }}</span>
+                <button @click="showSuccess = false" class="shrink-0 text-ink transition hover:text-lime" aria-label="Tutup notifikasi">
+                    <X class="h-4 w-4" />
                 </button>
             </div>
         </div>
 
         <!-- Error Toast -->
-        <div v-if="showError" class="fixed top-28 right-6 z-[9999] animate-slide-in">
-            <div class="bg-red-400/95 border-2 border-red-400 text-ink px-6 py-4 rounded shadow-hard flex items-center gap-3 min-w-[300px] max-w-md">
-                <CircleX class="w-5 h-5 flex-shrink-0" />
-                <span class="text-sm font-semibold">{{ errorMessage }}</span>
-                <button @click="showError = false" class="ml-auto text-ink hover:text-red-400 transition">
-                    <X class="w-4 h-4" />
+        <div v-if="showError" class="fixed left-4 right-4 top-28 z-[9999] animate-slide-in sm:left-auto sm:right-6">
+            <div class="flex w-full items-center gap-3 rounded border-2 border-red-400 bg-red-400/95 px-4 py-4 text-ink shadow-hard sm:w-auto sm:min-w-[300px] sm:max-w-md">
+                <CircleX class="h-5 w-5 flex-shrink-0" />
+                <span class="min-w-0 flex-1 break-words text-sm font-semibold">{{ errorMessage }}</span>
+                <button @click="showError = false" class="shrink-0 text-ink transition hover:text-red-400" aria-label="Tutup notifikasi">
+                    <X class="h-4 w-4" />
                 </button>
             </div>
         </div>

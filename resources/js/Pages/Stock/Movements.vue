@@ -42,7 +42,7 @@ const reset = () => {
         <div class="bg-canvas min-h-screen py-8"><div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <PageHeader title="Riwayat Stok" subtitle="Semua pergerakan stok masuk dan keluar." />
 
-            <Card class="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <Card class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
                 <FormSelect v-model="productId">
                     <option value="">Semua produk</option>
                     <option v-for="product in products" :key="product.id" :value="product.id">{{ product.name }}</option>

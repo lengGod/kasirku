@@ -92,7 +92,7 @@ const growthLabel = computed(() => {
                 <a :href="route('shifts.open')" class="ml-2 font-bold underline">Buka shift</a>
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="relative border-2 border-ink bg-lime p-5 shadow-hard">
                     <div class="mb-3 flex items-start justify-between">
                         <p class="text-[11px] font-bold uppercase tracking-[0.15em] text-ink/80">Penjualan Hari Ini</p>
@@ -132,7 +132,7 @@ const growthLabel = computed(() => {
                 </div>
             </div>
 
-            <div class="mt-6 grid gap-6 lg:grid-cols-3">
+            <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <Card class="lg:col-span-2">
                     <div class="mb-4 flex items-center justify-between">
                         <h2 class="font-display text-lg font-bold text-ink">Penjualan 7 Hari</h2>
@@ -143,8 +143,8 @@ const growthLabel = computed(() => {
                             <div class="flex h-40 w-full items-end">
                                 <div class="w-full bg-violet-text transition-all" :style="{ height: `${chartBarHeight(row.total)}px` }" :title="formatRupiah(row.total)"></div>
                             </div>
-                            <p class="text-[9px] font-bold text-violet-text">{{ formatRupiah(row.total) }}</p>
-                            <p class="text-[10px] font-semibold text-muted">{{ row.label }}</p>
+                            <p class="w-full truncate text-center text-[8px] font-bold text-violet-text sm:text-[9px]" :title="formatRupiah(row.total)">{{ formatRupiah(row.total) }}</p>
+                            <p class="w-full truncate text-center text-[10px] font-semibold text-muted">{{ row.label }}</p>
                         </div>
                     </div>
                     <p v-else class="py-16 text-center text-sm text-muted">Belum ada data penjualan.</p>
@@ -159,23 +159,23 @@ const growthLabel = computed(() => {
                                 <p class="truncate text-sm font-semibold text-ink">{{ product.name }}</p>
                                 <p class="text-xs text-muted">{{ formatNumber(product.qty, 0) }} terjual</p>
                             </div>
-                            <p class="text-xs font-bold text-ink">{{ formatRupiah(product.total) }}</p>
+                            <p class="shrink-0 text-xs font-bold text-ink">{{ formatRupiah(product.total) }}</p>
                         </div>
                     </div>
                     <p v-else class="text-sm text-muted">Belum ada penjualan.</p>
                 </Card>
             </div>
 
-            <div class="mt-6 grid gap-6 lg:grid-cols-2">
+            <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <Card>
                     <h2 class="mb-4 font-display text-lg font-bold text-ink">Stok Menipis</h2>
                     <div v-if="lowStock.length" class="space-y-3">
                         <div v-for="product in lowStock" :key="product.id" class="flex items-center justify-between gap-3 border-b border-line pb-3 last:border-0 last:pb-0">
-                            <div>
-                                <p class="text-sm font-semibold text-ink">{{ product.name }}</p>
-                                <p class="text-xs text-muted">{{ product.category?.name }} · {{ product.unit?.short_name }}</p>
+                            <div class="min-w-0">
+                                <p class="truncate text-sm font-semibold text-ink">{{ product.name }}</p>
+                                <p class="truncate text-xs text-muted">{{ product.category?.name }} · {{ product.unit?.short_name }}</p>
                             </div>
-                            <span class="bg-bad-bg px-3 py-1 text-xs font-bold text-bad-fg">{{ formatNumber(product.stock_quantity, 0) }}</span>
+                            <span class="shrink-0 bg-bad-bg px-3 py-1 text-xs font-bold text-bad-fg">{{ formatNumber(product.stock_quantity, 0) }}</span>
                         </div>
                     </div>
                     <p v-else class="text-sm text-muted">Semua stok aman.</p>
@@ -185,11 +185,11 @@ const growthLabel = computed(() => {
                     <h2 class="mb-4 font-display text-lg font-bold text-ink">Transaksi Terakhir</h2>
                     <div v-if="recentSales.length" class="space-y-3">
                         <a v-for="sale in recentSales" :key="sale.id" :href="route('sales.show', sale.id)" class="flex items-center justify-between gap-3 border-b border-line pb-3 last:border-0 last:pb-0 hover:text-violet-text">
-                            <div>
-                                <p class="text-sm font-semibold text-ink">{{ sale.invoice_number }}</p>
-                                <p class="text-xs text-muted">{{ sale.cashier?.name }} · {{ sale.customer?.name ?? 'Umum' }}</p>
+                            <div class="min-w-0">
+                                <p class="truncate text-sm font-semibold text-ink">{{ sale.invoice_number }}</p>
+                                <p class="truncate text-xs text-muted">{{ sale.cashier?.name }} · {{ sale.customer?.name ?? 'Umum' }}</p>
                             </div>
-                            <p class="text-sm font-bold text-ink">{{ formatRupiah(sale.grand_total) }}</p>
+                            <p class="shrink-0 text-sm font-bold text-ink">{{ formatRupiah(sale.grand_total) }}</p>
                         </a>
                     </div>
                     <p v-else class="text-sm text-muted">Belum ada transaksi.</p>

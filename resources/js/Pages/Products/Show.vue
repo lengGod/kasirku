@@ -21,7 +21,7 @@ defineProps({ product: Object });
                 </template>
             </PageHeader>
 
-            <div class="grid gap-4 sm:grid-cols-3">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div class="border-2 border-ink bg-surface p-4 shadow-hard">
                     <p class="text-[11px] font-bold uppercase text-muted">Harga Jual</p>
                     <p class="font-display text-xl font-bold text-ink">{{ formatRupiah(product.sell_price) }}</p>

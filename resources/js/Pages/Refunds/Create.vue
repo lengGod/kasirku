@@ -57,7 +57,7 @@ const submit = () => {
                 </template>
             </PageHeader>
 
-            <div v-if="!form.sale_id" class="grid gap-6 lg:grid-cols-3">
+            <div v-if="!form.sale_id" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <Card class="lg:col-span-2">
                     <h2 class="mb-4 font-display text-lg font-bold">Pilih Transaksi untuk Retur</h2>
                     <div class="space-y-3">
@@ -75,7 +75,7 @@ const submit = () => {
                 </Card>
             </div>
 
-            <div v-else class="grid gap-6 lg:grid-cols-2">
+            <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <Card>
                     <h2 class="mb-4 font-display text-lg font-bold">Detail Retur</h2>
                     <form @submit.prevent="submit" class="space-y-4">

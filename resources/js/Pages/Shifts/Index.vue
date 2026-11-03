@@ -27,7 +27,7 @@ defineProps({ shifts: Object, openShift: Object });
             <div class="mb-6">
                 <div v-if="openShift" class="border-2 border-ink bg-ink p-4 text-white shadow-hard">
                     <div class="mb-2 font-display text-lg font-bold">Shift Saat Ini</div>
-                    <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 text-sm">
                         <div>
                             <p class="text-white/70">Kasir</p>
                             <p class="font-semibold">{{ openShift.user?.name }}</p>

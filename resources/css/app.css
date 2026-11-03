@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    html,
+    body {
+        overflow-x: hidden;
+    }
+
+    @supports (overflow-x: clip) {
+        html,
+        body {
+            overflow-x: clip;
+        }
+    }
+}
+
 @layer components {
     table:not(.receipt-table) {
         width: 100%;

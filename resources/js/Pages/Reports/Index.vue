@@ -132,7 +132,7 @@ const goPdf = () => {
             </div>
 
             <Card tone="surface">
-                <div class="grid gap-3 sm:grid-cols-[1fr_auto_auto] p-4">
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto] p-4">
                     <div class="relative">
                         <Filter class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                         <input v-model="dateFrom" type="date" class="h-11 pl-9 border-2 border-ink px-3 text-sm" />
@@ -174,7 +174,7 @@ const goPdf = () => {
                     </div>
 
                     <div class="p-4 border-t-2 border-ink">
-                        <dl class="grid gap-2 sm:grid-cols-2">
+                        <dl class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                             <div v-for="(value, key) in summary" :key="key" class="flex justify-between">
                                 <span class="text-xs text-muted">{{ summaryLabel(key) }}</span>
                                 <span class="text-sm font-bold text-ink">{{ typeof value === 'number' ? formatSummary(key, value) : value }}</span>

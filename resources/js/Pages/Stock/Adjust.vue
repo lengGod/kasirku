@@ -62,7 +62,7 @@ const submit = () => {
                         </button>
                     </div>
 
-                    <div v-for="(item, index) in form.items" :key="index" class="grid gap-2 border-2 border-line p-3 sm:grid-cols-[1fr_140px_auto]">
+                    <div v-for="(item, index) in form.items" :key="index" class="grid grid-cols-1 gap-2 border-2 border-line p-3 sm:grid-cols-[1fr_140px_auto]">
                         <FormSelect v-model="item.product_id" required @change="onProductChange(index)">
                             <option value="">Pilih produk</option>
                             <option v-for="product in products" :key="product.id" :value="product.id">

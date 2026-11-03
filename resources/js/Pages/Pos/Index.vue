@@ -194,12 +194,54 @@ const lookupBarcode = async (rawCode) => {
 
 const scanBarcode = () => lookupBarcode(barcodeInput.value);
 
-const stopCamera = async () => {
-    scanning.value = false;
+const SCAN_READER_ID = 'pos-scan-reader';
 
-    const instance = scannerInstance;
-    scannerInstance = null;
+const cameraErrorMessage = (error) => {
+    const name = error?.name || '';
+    const message = String(error?.message ?? error ?? '');
+    const details = `${name} ${message}`;
 
+    if (!window.isSecureContext) {
+        return 'Kamera hanya bisa diakses melalui HTTPS. Buka situs dengan alamat https:// lalu coba lagi.';
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+        return 'Browser ini tidak mendukung akses kamera. Gunakan Chrome, Edge, atau Safari terbaru.';
+    }
+
+    if (/NotAllowed|Permission|denied/i.test(details)) {
+        return 'Izin kamera ditolak. Di browser, buka Pengaturan Situs > Kamera > Izinkan, lalu muat ulang halaman.';
+    }
+
+    if (/NotFound|DevicesNotFound/i.test(details)) {
+        return 'Kamera tidak ditemukan. Pastikan perangkat memiliki kamera dan tidak sedang dipakai aplikasi lain.';
+    }
+
+    if (/NotReadable|TrackStart/i.test(details)) {
+        return 'Kamera sedang dipakai aplikasi lain. Tutup aplikasi kamera lain, lalu tekan Kamera lagi.';
+    }
+
+    if (/Overconstrained|ConstraintNotSatisfied/i.test(details)) {
+        return 'Kamera belakang tidak tersedia. Coba kamera depan atau perangkat lain.';
+    }
+
+    return 'Kamera gagal dimulai. Tutup aplikasi lain yang memakai kamera, lalu coba lagi.';
+};
+
+const isCameraPermissionError = (error) => /NotAllowed|Permission|denied/i.test(`${error?.name || ''} ${error?.message || error || ''}`);
+
+const buildScanConfig = () => ({
+    fps: 10,
+    aspectRatio: 1.0,
+    qrbox: (viewfinderWidth, viewfinderHeight) => {
+        const width = Math.max(140, Math.min(Math.floor(viewfinderWidth * 0.8), 320));
+        const height = Math.max(90, Math.min(Math.floor(viewfinderHeight * 0.5), Math.floor(width * 0.62)));
+
+        return { width, height };
+    },
+});
+
+const disposeScanner = async (instance) => {
     if (!instance) {
         return;
     }
@@ -215,6 +257,69 @@ const stopCamera = async () => {
     } catch {
         // Scanner container might already be cleared.
     }
+};
+
+const createScanner = () => {
+    const instance = new Html5Qrcode(SCAN_READER_ID, { verbose: false });
+    scannerInstance = instance;
+
+    return instance;
+};
+
+const startScanner = async (instance) => {
+    try {
+        await instance.start(
+            { facingMode: 'environment' },
+            buildScanConfig(),
+            handleScanSuccess,
+            () => {},
+        );
+    } catch (error) {
+        if (isCameraPermissionError(error)) {
+            throw error;
+        }
+
+        // Sebagian browser mobile menolak facingMode walau kamera belakang tersedia.
+        // Coba lagi memakai deviceId kamera belakang.
+        await disposeScanner(instance);
+        await new Promise((resolve) => setTimeout(resolve, 250));
+
+        let cameras = [];
+
+        try {
+            cameras = await Html5Qrcode.getCameras();
+        } catch (cameraListError) {
+            if (isCameraPermissionError(cameraListError)) {
+                throw cameraListError;
+            }
+
+            throw error;
+        }
+
+        if (!cameras.length) {
+            throw error;
+        }
+
+        const backCamera = cameras.find((camera) => /back|rear|environment|belakang/i.test(camera.label));
+        const camera = backCamera ?? cameras[cameras.length - 1];
+        const retryInstance = createScanner();
+
+        await retryInstance.start(
+            { deviceId: { exact: camera.id } },
+            buildScanConfig(),
+            handleScanSuccess,
+            () => {},
+        );
+    }
+};
+
+const stopCamera = async () => {
+    scanning.value = false;
+
+    const instance = scannerInstance;
+    scannerInstance = null;
+
+    await disposeScanner(instance);
 };
 
 const handleScanSuccess = (decodedText) => {
@@ -236,28 +341,32 @@ const startCamera = async () => {
     scanning.value = true;
     await nextTick();
 
-    try {
-        const instance = new Html5Qrcode('pos-scan-reader', { verbose: false });
-        scannerInstance = instance;
+    if (!document.getElementById(SCAN_READER_ID)) {
+        cameraError.value = 'Area kamera tidak ditemukan. Muat ulang halaman lalu coba lagi.';
+        scanning.value = false;
 
-        await instance.start(
-            { facingMode: 'environment' },
-            { fps: 10, qrbox: { width: 260, height: 160 } },
-            handleScanSuccess,
-            () => {},
-        );
-    } catch {
-        cameraError.value = 'Kamera tidak dapat diakses. Pastikan izin kamera aktif dan halaman dibuka melalui HTTPS atau localhost.';
+        return;
+    }
+
+    try {
+        if (!window.isSecureContext) {
+            throw new Error('Kamera membutuhkan HTTPS.');
+        }
+
+        if (!navigator.mediaDevices?.getUserMedia) {
+            throw new Error('Browser tidak mendukung akses kamera.');
+        }
+
+        await startScanner(createScanner());
+    } catch (error) {
+        console.error('[kamera]', error);
+        cameraError.value = cameraErrorMessage(error);
         scanning.value = false;
 
         const instance = scannerInstance;
         scannerInstance = null;
 
-        try {
-            instance?.clear();
-        } catch {
-            // Ignore cleanup errors.
-        }
+        await disposeScanner(instance);
     }
 };
 
@@ -369,9 +478,9 @@ watch(search, () => {
                 {{ errors.items || errors.payments || errors.shift }}
             </div>
 
-            <div class="grid gap-6 lg:grid-cols-[1fr_420px]">
-                <div class="border-2 border-ink bg-surface p-4 shadow-hard sm:p-6">
-                    <div class="mb-4 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_420px]">
+                <div class="min-w-0 border-2 border-ink bg-surface p-4 shadow-hard sm:p-6">
+                    <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto]">
                         <div class="relative">
                             <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                             <input
@@ -410,7 +519,7 @@ watch(search, () => {
                     </p>
 
                     <div v-show="scanning" class="mb-4 border-2 border-ink bg-ink p-2">
-                        <div id="pos-scan-reader" class="mx-auto w-full max-w-sm overflow-hidden"></div>
+                        <div id="pos-scan-reader" class="mx-auto min-h-[220px] w-full max-w-sm overflow-hidden"></div>
                         <p class="mt-2 text-center text-xs font-semibold text-lime">Arahkan kamera ke barcode produk.</p>
                     </div>
 
@@ -438,27 +547,27 @@ watch(search, () => {
                             v-for="product in filteredProducts"
                             :key="product.id"
                             type="button"
-                            class="group flex flex-col justify-between border-2 border-ink bg-surface p-3 text-left transition hover:bg-hi"
+                            class="group flex min-w-0 flex-col justify-between border-2 border-ink bg-surface p-3 text-left transition hover:bg-hi"
                             @click="addProduct(product)"
                         >
-                            <div>
-                                <div class="mb-2 flex items-start justify-between gap-2">
-                                    <span class="bg-surface-2 px-2 py-1 text-[10px] font-bold uppercase text-muted">{{ product.category ?? '-' }}</span>
-                                    <span v-if="product.track_stock" :class="['px-2 py-1 text-[10px] font-bold', product.stock > 0 ? 'bg-ok-bg text-ok-fg' : 'bg-bad-bg text-bad-fg']">
+                            <div class="min-w-0">
+                                <div class="mb-2 flex min-w-0 items-start justify-between gap-2">
+                                    <span class="min-w-0 truncate bg-surface-2 px-2 py-1 text-[10px] font-bold uppercase text-muted">{{ product.category ?? '-' }}</span>
+                                    <span v-if="product.track_stock" :class="['shrink-0 px-2 py-1 text-[10px] font-bold', product.stock > 0 ? 'bg-ok-bg text-ok-fg' : 'bg-bad-bg text-bad-fg']">
                                         {{ formatNumber(product.stock, 0) }}
                                     </span>
                                 </div>
                                 <p class="line-clamp-2 text-sm font-bold leading-snug text-ink">{{ product.name }}</p>
-                                <p class="mt-1 text-[11px] text-muted">{{ product.sku }} · {{ product.unit }}</p>
+                                <p class="mt-1 truncate text-[11px] text-muted">{{ product.sku }} · {{ product.unit }}</p>
                             </div>
-                            <p class="mt-3 font-display text-base font-bold text-violet-text">{{ formatRupiah(product.sell_price) }}</p>
+                            <p class="mt-3 truncate font-display text-base font-bold text-violet-text">{{ formatRupiah(product.sell_price) }}</p>
                         </button>
                     </div>
 
                     <p v-if="!filteredProducts.length" class="py-12 text-center text-sm text-muted">Produk tidak ditemukan.</p>
                 </div>
 
-                <div class="h-fit border-2 border-ink bg-surface shadow-hard lg:sticky lg:top-20">
+                <div class="h-fit min-w-0 border-2 border-ink bg-surface shadow-hard lg:sticky lg:top-20">
                     <div class="flex items-center justify-between border-b-2 border-ink bg-ink px-4 py-3">
                         <div class="flex items-center gap-2 text-lime">
                             <ShoppingCart class="h-5 w-5" />
@@ -548,7 +657,7 @@ watch(search, () => {
 
                 <div class="space-y-3">
                     <div v-for="(payment, index) in payments" :key="index" class="border-2 border-ink p-3">
-                        <div class="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+                        <div class="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
                             <FormSelect v-model="payment.payment_method_id">
                                 <option v-for="method in paymentMethods" :key="method.id" :value="method.id">{{ method.name }}</option>
                             </FormSelect>

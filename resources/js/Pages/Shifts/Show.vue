@@ -27,7 +27,7 @@ const statusLabel = (status) => props.statuses.find((item) => item.value === sta
                 </template>
             </PageHeader>
 
-            <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 <div class="border-2 border-ink bg-surface p-5 shadow-hard">
                     <p class="text-[11px] font-bold uppercase tracking-wide text-muted">Jumlah Transaksi</p>
                     <p class="font-display text-3xl font-bold text-ink">{{ formatNumber(summary.transaction_count ?? 0, 0) }}</p>
@@ -46,13 +46,13 @@ const statusLabel = (status) => props.statuses.find((item) => item.value === sta
                 </div>
             </div>
 
-            <div class="mt-6 grid gap-6 lg:grid-cols-2">
+            <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <Card tone="surface">
                     <div class="mb-4 flex items-center justify-between">
                         <h2 class="font-display text-lg font-bold text-ink">Detail Shift</h2>
                         <span class="bg-surface-2 px-3 py-1 text-[10px] font-bold text-muted">{{ shift.status === 'open' ? 'Terbuka' : 'Ditutup' }}</span>
                     </div>
-                    <dl class="grid gap-3 sm:grid-cols-2 text-sm">
+                    <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
                         <dt class="text-muted">Kasir</dt><dd class="font-semibold text-ink">{{ shift.user?.name }}</dd>
                         <dt class="text-muted">Dibuka</dt><dd class="font-semibold text-ink">{{ formatDateLong(shift.opened_at) }}</dd>
                         <dt class="text-muted">Ditutup</dt><dd class="font-semibold text-ink">{{ shift.closed_at ? formatDateLong(shift.closed_at) : 'Belum ditutup' }}</dd>

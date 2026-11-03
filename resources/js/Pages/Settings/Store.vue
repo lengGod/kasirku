@@ -22,7 +22,7 @@ const submit = () => {
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <PageHeader title="Pengaturan Toko" subtitle="Nama toko, pajak, dan cetak struk." />
             <form class="space-y-4 border-2 border-ink bg-surface p-5 shadow-hard" @submit.prevent="submit">
-                <div class="grid gap-3 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                         <label class="mb-1 block text-sm font-semibold">Nama Toko</label>
                         <FormInput v-model="form.store_name" required />

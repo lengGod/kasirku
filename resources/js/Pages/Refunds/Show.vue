@@ -20,7 +20,7 @@ defineProps({ refund: Object });
             </PageHeader>
 
             <Card tone="surface">
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-wide text-muted">No. Retur</p>
                         <p class="font-display text-xl font-bold text-ink">{{ refund.refund_number }}</p>

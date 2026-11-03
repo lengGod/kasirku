@@ -26,7 +26,7 @@ const toneClass = computed(() => tones[props.tone] ?? tones.surface);
 </script>
 
 <template>
-    <div :class="['relative border-2 border-ink p-4 sm:p-6', toneClass]">
+    <div :class="['relative min-w-0 border-2 border-ink p-4 sm:p-6', toneClass]">
         <slot />
     </div>
 </template>

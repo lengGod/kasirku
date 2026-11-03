@@ -62,6 +62,13 @@ const visibleNavigation = computed(() => navigation
     .filter((group) => !group.ability || can(group.ability))
     .filter((group) => group.direct || group.items.length > 0));
 
+const mobileNavItems = computed(() => [
+    { label: 'Dashboard', route: 'dashboard', icon: LayoutDashboard },
+    { label: 'POS', route: 'pos.index', icon: ShoppingCart },
+    { label: 'Penjualan', route: 'sales.index', icon: History, matches: ['sales.*', 'refunds.*'] },
+    { label: 'Stok', route: 'stock.movements', icon: Package, matches: ['stock.*'] },
+]);
+
 const toggleDropdown = (label) => {
     activeDropdown.value = activeDropdown.value === label ? null : label;
 };
@@ -81,7 +88,15 @@ const closeMobileMenu = () => {
 };
 
 const isItemActive = (item) => {
-    return route().current(item.route) || (item.match ? route().current(item.match) : false);
+    if (route().current(item.route)) {
+        return true;
+    }
+
+    if (Array.isArray(item.matches)) {
+        return item.matches.some((pattern) => route().current(pattern));
+    }
+
+    return item.match ? route().current(item.match) : false;
 };
 
 const isDropdownActive = (dropdownItems) => {
@@ -94,7 +109,7 @@ watch(showMobileMenu, (val) => {
 </script>
 
 <template>
-    <div>
+    <div class="overflow-x-hidden lg:overflow-x-visible">
         <FlashMessage />
 
         <!-- Attribution Banner -->
@@ -104,10 +119,6 @@ watch(showMobileMenu, (val) => {
         <nav class="fixed top-9 left-0 right-0 h-16 bg-ink flex items-center px-4 sm:px-6 z-50 shadow-hard">
             <div class="flex items-center justify-between w-full max-w-full gap-2">
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <button @click="showMobileMenu = true" class="lg:hidden text-white hover:text-lime transition p-2 -ml-2" aria-label="Buka menu">
-                        <Menu class="w-6 h-6" />
-                    </button>
-
                     <Link :href="route('dashboard')" class="text-lime font-bold text-lg sm:text-xl font-display hover:text-yellow-300 transition flex-shrink-0">
                         KasirKu
                     </Link>
@@ -229,8 +240,26 @@ watch(showMobileMenu, (val) => {
             </aside>
         </Transition>
 
-        <div class="mt-[6.25rem] bg-canvas min-h-screen">
+        <div class="mt-[6.25rem] min-h-screen overflow-x-hidden bg-canvas pb-28 lg:overflow-x-visible lg:pb-0">
             <slot />
         </div>
+
+        <!-- Bottom navigation (mobile) -->
+        <nav class="fixed inset-x-0 bottom-0 z-50 border-t-2 border-ink-3 bg-ink pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Navigasi utama mobile">
+            <div class="grid h-16 grid-cols-5">
+                <Link v-for="item in mobileNavItems" :key="item.label" :href="route(item.route)"
+                    :class="['flex min-w-0 flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-semibold transition', isItemActive(item) ? 'text-lime' : 'text-white/70 hover:text-lime']"
+                    :aria-current="isItemActive(item) ? 'page' : undefined">
+                    <component :is="item.icon" class="h-5 w-5 shrink-0" />
+                    <span class="w-full truncate text-center">{{ item.label }}</span>
+                </Link>
+                <button type="button" @click="showMobileMenu = true"
+                    :class="['flex min-w-0 flex-col items-center justify-center gap-0.5 px-1 text-[10px] font-semibold transition', showMobileMenu ? 'text-lime' : 'text-white/70 hover:text-lime']"
+                    aria-label="Buka menu lengkap">
+                    <Menu class="h-5 w-5 shrink-0" />
+                    <span class="w-full truncate text-center">Menu</span>
+                </button>
+            </div>
+        </nav>
     </div>
 </template>
