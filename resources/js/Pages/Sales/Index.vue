@@ -63,10 +63,7 @@ const statusLabel = (status) => props.statuses.find((item) => item.value === sta
                 </Card>
 
                 <Card class="shadow-hard">
-                    <div v-if="!sales.data?.length" class="py-8 text-center">
-                        <p class="text-sm text-muted">Belum ada transaksi penjualan.</p>
-                    </div>
-                    <div v-else class="overflow-x-auto">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
                         <tr>
@@ -80,6 +77,9 @@ const statusLabel = (status) => props.statuses.find((item) => item.value === sta
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!sales.data?.length">
+                            <td colspan="7" class="px-4 py-10 text-center text-sm text-muted">Belum ada transaksi penjualan.</td>
+                        </tr>
                         <tr v-for="sale in sales.data" :key="sale.id" class="border-b border-surface-2 hover:bg-surface-2">
                             <td class="px-4 py-4 font-semibold text-ink">{{ sale.invoice_number }}</td>
                             <td class="px-4 py-4 text-muted">{{ formatDateLong(sale.created_at) }}</td>

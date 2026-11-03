@@ -45,8 +45,7 @@ const printPdf = () => {
             </PageHeader>
 
             <Card class="shadow-hard">
-                <div v-if="!products?.length" class="text-center py-8"><p class="text-muted text-sm">Belum ada produk.</p></div>
-                <div v-else class="overflow-x-auto">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr>
@@ -57,6 +56,9 @@ const printPdf = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!products?.length">
+                            <td colspan="4" class="px-4 py-10 text-center text-sm text-muted">Belum ada produk.</td>
+                        </tr>
                         <tr v-for="product in products" :key="product.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3">
                                 <input type="checkbox" :model-value="checked" :value="product.id" @change="toggle(product.id)" class="h-4 w-4 accent-lime border-2 border-ink rounded" />

@@ -14,10 +14,21 @@ enum SaleStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Paid => 'Dibayar',
+            self::Paid => 'Lunas',
             self::Voided => 'Void',
             self::Refunded => 'Retur Penuh',
             self::PartialRefund => 'Retur Sebagian',
         };
+    }
+
+    /**
+     * @return array<int, array{value: string, label: string}>
+     */
+    public static function options(): array
+    {
+        return array_map(fn (self $status): array => [
+            'value' => $status->value,
+            'label' => $status->label(),
+        ], self::cases());
     }
 }

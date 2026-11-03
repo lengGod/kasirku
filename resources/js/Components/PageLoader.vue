@@ -11,7 +11,7 @@ const start = (event) => {
     const currentUrl = new URL(window.location.href);
     const nextUrl = new URL(event.detail.visit.url, window.location.origin);
 
-    if (nextUrl.pathname === currentUrl.pathname) {
+    if (nextUrl.pathname === currentUrl.pathname || nextUrl.pathname.endsWith('/print-log')) {
         return;
     }
 
@@ -61,7 +61,7 @@ onUnmounted(() => {
         >
             <div
                 v-if="loading"
-                class="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/40 backdrop-blur-sm"
+                class="fixed inset-0 z-[10000] flex items-center justify-center bg-ink/40 backdrop-blur-sm print:hidden"
                 role="status"
                 aria-live="polite"
             >

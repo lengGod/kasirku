@@ -21,6 +21,8 @@ class ReportController extends Controller
 
     public function index(Request $request, string $type = 'sales'): Response
     {
+        $type = (string) $request->query('type', $type);
+
         abort_unless(in_array($type, self::TYPES, true), 404);
 
         $report = $this->build($type, $request);

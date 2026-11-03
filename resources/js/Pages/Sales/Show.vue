@@ -4,13 +4,22 @@ import PageHeader from '@/Components/PageHeader.vue';
 import Card from '@/Components/Card.vue';
 import FormInput from '@/Components/FormInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import StatusChip from '@/Components/StatusChip.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { formatDateLong, formatRupiah } from '@/Utils/format';
 import { useAuthorization } from '@/Utils/authorization';
 import { AlertTriangle } from '@lucide/vue';
 
-const props = defineProps({ sale: Object });
+const props = defineProps({
+    sale: Object,
+    statuses: {
+        type: Array,
+        default: () => [],
+    },
+});
 const { can } = useAuthorization();
+
+const statusLabel = (status) => props.statuses.find((item) => item.value === status)?.label ?? status;
 
 const voidForm = useForm({
     reason: '',
@@ -60,9 +69,11 @@ const submitVoid = () => {
                     </div>
                     <div class="col-span-full">
                         <p class="text-[11px] font-bold uppercase tracking-wide text-muted">Status</p>
-                        <span class="bg-surface-2 px-3 py-1 text-xs font-bold text-ink">{{ sale.status }}</span>
+                        <StatusChip :status="sale.status === 'partial_refund' ? 'adj' : sale.status">
+                            {{ statusLabel(sale.status) }}
+                        </StatusChip>
                     </div>
-                    <div v-if="sale.status !== 'paid'" class="col-span-full border-t-2 border-ink pt-3">
+                    <div v-if="sale.status === 'voided'" class="col-span-full border-t-2 border-ink pt-3">
                         <p class="text-[11px] font-bold uppercase tracking-wide text-muted">Alasan Void</p>
                         <p class="font-bold text-ink">{{ sale.void_reason }}</p>
                         <p class="text-[11px] text-muted">Void oleh {{ sale.voidedBy?.name }} pada {{ sale.voided_at ? formatDateLong(sale.voided_at) : '-' }}</p>
@@ -86,6 +97,9 @@ const submitVoid = () => {
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-line">
+                            <tr v-if="!sale.items?.length">
+                                <td colspan="5" class="px-4 py-10 text-center text-sm text-muted">Belum ada item.</td>
+                            </tr>
                             <tr v-for="item in sale.items" :key="item.id">
                                 <td class="px-4 py-3 text-sm">{{ item.name_snapshot }}</td>
                                 <td class="px-4 py-3 text-sm text-right">{{ Number(item.qty) }}</td>

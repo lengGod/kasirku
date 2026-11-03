@@ -78,6 +78,9 @@ const destroy = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!users.data?.length">
+                            <td colspan="5" class="px-4 py-10 text-center text-sm text-muted">Belum ada pengguna.</td>
+                        </tr>
                         <tr v-for="user in users.data" :key="user.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm font-semibold text-ink">{{ user.name }}</td>
                             <td class="px-4 py-3 text-sm">{{ user.email }}</td>

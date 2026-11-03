@@ -84,6 +84,9 @@ const destroy = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!products.data.length">
+                            <td colspan="6" class="px-4 py-10 text-center text-sm text-muted">Produk tidak ditemukan.</td>
+                        </tr>
                         <tr v-for="product in products.data" :key="product.id" class="border-b border-surface-2 hover:bg-surface-2">
                             <td class="py-4 px-4">
                                 <p class="text-sm font-bold text-ink">{{ product.name }}</p>
@@ -109,8 +112,6 @@ const destroy = () => {
                 </table>
                 <Pagination :paginator="products" />
             </div>
-
-            <div v-if="!products.data.length" class="border-2 border-ink bg-surface p-8 text-center text-sm text-muted">Produk tidak ditemukan.</div>
         </div>
 
         <DeleteConfirm :is-open="!!deleting" :message="`Hapus produk ${deleting?.name}?`" @confirm="destroy" @cancel="deleting = null" />

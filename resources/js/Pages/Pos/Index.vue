@@ -8,9 +8,13 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import Modal from '@/Components/Modal.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { formatNumber, formatRupiah } from '@/Utils/format';
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Html5Qrcode } from 'html5-qrcode';
 import {
+    AlertCircle,
     Banknote,
+    Camera,
+    CameraOff,
     Minus,
     Plus,
     Search,
@@ -53,6 +57,9 @@ const payments = ref([]);
 const errors = ref({});
 const processing = ref(false);
 const barcodeRef = ref(null);
+const scanning = ref(false);
+const cameraError = ref('');
+let scannerInstance = null;
 
 if (props.resumeCart?.items) {
     cart.value = props.resumeCart.items.map((item) => ({
@@ -164,8 +171,8 @@ const clearCart = () => {
     errors.value = {};
 };
 
-const scanBarcode = async () => {
-    const code = barcodeInput.value.trim();
+const lookupBarcode = async (rawCode) => {
+    const code = String(rawCode ?? '').trim();
     if (!code) return;
 
     try {
@@ -184,6 +191,85 @@ const scanBarcode = async () => {
         errors.value = { items: 'Gagal mencari barcode.' };
     }
 };
+
+const scanBarcode = () => lookupBarcode(barcodeInput.value);
+
+const stopCamera = async () => {
+    scanning.value = false;
+
+    const instance = scannerInstance;
+    scannerInstance = null;
+
+    if (!instance) {
+        return;
+    }
+
+    try {
+        await instance.stop();
+    } catch {
+        // Camera might already be stopped.
+    }
+
+    try {
+        instance.clear();
+    } catch {
+        // Scanner container might already be cleared.
+    }
+};
+
+const handleScanSuccess = (decodedText) => {
+    if (!scanning.value) {
+        return;
+    }
+
+    stopCamera();
+    barcodeInput.value = decodedText;
+    lookupBarcode(decodedText);
+};
+
+const startCamera = async () => {
+    if (scanning.value) {
+        return;
+    }
+
+    cameraError.value = '';
+    scanning.value = true;
+    await nextTick();
+
+    try {
+        const instance = new Html5Qrcode('pos-scan-reader', { verbose: false });
+        scannerInstance = instance;
+
+        await instance.start(
+            { facingMode: 'environment' },
+            { fps: 10, qrbox: { width: 260, height: 160 } },
+            handleScanSuccess,
+            () => {},
+        );
+    } catch {
+        cameraError.value = 'Kamera tidak dapat diakses. Pastikan izin kamera aktif dan halaman dibuka melalui HTTPS atau localhost.';
+        scanning.value = false;
+
+        const instance = scannerInstance;
+        scannerInstance = null;
+
+        try {
+            instance?.clear();
+        } catch {
+            // Ignore cleanup errors.
+        }
+    }
+};
+
+onMounted(() => {
+    if (window.matchMedia('(pointer: fine)').matches) {
+        barcodeRef.value?.focus();
+    }
+});
+
+onBeforeUnmount(() => {
+    stopCamera();
+});
 
 const openPayment = () => {
     if (!cart.value.length) {
@@ -285,7 +371,7 @@ watch(search, () => {
 
             <div class="grid gap-6 lg:grid-cols-[1fr_420px]">
                 <div class="border-2 border-ink bg-surface p-4 shadow-hard sm:p-6">
-                    <div class="mb-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+                    <div class="mb-4 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
                         <div class="relative">
                             <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
                             <input
@@ -303,9 +389,29 @@ watch(search, () => {
                                 type="text"
                                 placeholder="Scan barcode + Enter"
                                 class="h-12 w-full border-2 border-ink bg-lime/20 pl-10 pr-4 text-sm focus:border-violet-text focus:outline-none sm:w-64"
-                                @keyup.enter="scanBarcode"
+                                @keyup.enter="scanBarcode()"
                             />
                         </div>
+                        <button
+                            type="button"
+                            class="inline-flex h-12 items-center justify-center gap-2 border-2 border-ink px-4 text-xs font-bold shadow-hard transition"
+                            :class="scanning ? 'bg-ink text-lime' : 'bg-surface text-ink hover:bg-hi'"
+                            @click="scanning ? stopCamera() : startCamera()"
+                        >
+                            <CameraOff v-if="scanning" class="h-4 w-4" />
+                            <Camera v-else class="h-4 w-4" />
+                            {{ scanning ? 'Tutup' : 'Kamera' }}
+                        </button>
+                    </div>
+
+                    <p v-if="cameraError" class="mb-3 flex items-start gap-2 text-xs font-semibold text-bad-fg">
+                        <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+                        {{ cameraError }}
+                    </p>
+
+                    <div v-show="scanning" class="mb-4 border-2 border-ink bg-ink p-2">
+                        <div id="pos-scan-reader" class="mx-auto w-full max-w-sm overflow-hidden"></div>
+                        <p class="mt-2 text-center text-xs font-semibold text-lime">Arahkan kamera ke barcode produk.</p>
                     </div>
 
                     <div class="mb-4 flex flex-wrap gap-2">

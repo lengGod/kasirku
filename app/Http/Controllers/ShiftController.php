@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\CashMovementType;
+use App\Enums\SaleStatus;
 use App\Enums\ShiftStatus;
 use App\Models\Shift;
 use App\Services\ShiftService;
@@ -89,6 +90,7 @@ class ShiftController extends Controller
         return Inertia::render('Shifts/Show', [
             'shift' => $shift,
             'summary' => $shifts->summary($shift),
+            'statuses' => SaleStatus::options(),
         ]);
     }
 

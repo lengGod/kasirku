@@ -40,13 +40,13 @@ const isNext = (label) => !!label && (label === 'pagination.next' || label.inclu
         <!-- Loading Overlay covering the table container Card -->
         <div
             v-if="loading"
-            class="absolute inset-0 z-20 flex items-center justify-center bg-ink/10 backdrop-blur-[1px]"
+            class="absolute inset-0 z-20 flex items-center justify-center bg-ink/10 p-3 backdrop-blur-[1px] sm:p-4 print:hidden"
             role="status"
             aria-live="polite"
         >
-            <div class="flex items-center gap-3 border-2 border-ink bg-surface px-6 py-4 shadow-hard">
-                <LoaderCircle class="h-6 w-6 animate-spin text-violet-text" />
-                <p class="text-xs font-semibold tracking-wide text-ink">Memuat halaman...</p>
+            <div class="flex w-full max-w-[240px] flex-col items-center justify-center gap-2 border-2 border-ink bg-surface px-4 py-3 text-center shadow-hard sm:w-auto sm:max-w-none sm:flex-row sm:gap-3 sm:px-6 sm:py-4">
+                <LoaderCircle class="h-5 w-5 shrink-0 animate-spin text-violet-text sm:h-6 sm:w-6" />
+                <p class="text-[11px] font-semibold leading-tight tracking-wide text-ink sm:text-xs">Memuat data...</p>
             </div>
         </div>
 

@@ -60,8 +60,7 @@ const reset = () => {
             </Card>
 
             <Card class="shadow-hard">
-                <div v-if="!movements.data?.length" class="text-center py-8"><p class="text-muted text-sm">Belum ada pergerakan stok.</p></div>
-                <div v-else class="overflow-x-auto">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-surface-2">
                         <tr>
@@ -74,6 +73,9 @@ const reset = () => {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-line">
+                        <tr v-if="!movements.data?.length">
+                            <td colspan="6" class="px-4 py-10 text-center text-sm text-muted">Belum ada pergerakan stok.</td>
+                        </tr>
                         <tr v-for="movement in movements.data" :key="movement.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm text-muted">{{ formatDateLong(movement.created_at) }}</td>
                             <td class="px-4 py-3 text-sm font-semibold text-ink">{{ movement.product?.name }}</td>

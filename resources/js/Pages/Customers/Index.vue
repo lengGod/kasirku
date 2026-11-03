@@ -55,8 +55,7 @@ const destroy = () => {
             </PageHeader>
 
             <Card class="shadow-hard">
-                <div v-if="!customers.data?.length" class="text-center py-8"><p class="text-muted text-sm">Belum ada pelanggan.</p></div>
-                <div v-else class="overflow-x-auto">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr>
@@ -67,6 +66,9 @@ const destroy = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!customers.data?.length">
+                            <td colspan="4" class="px-4 py-10 text-center text-sm text-muted">Belum ada pelanggan.</td>
+                        </tr>
                         <tr v-for="customer in customers.data" :key="customer.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3">
                                 <p class="text-sm font-semibold text-ink">{{ customer.name }}</p>

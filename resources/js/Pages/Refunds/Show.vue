@@ -66,6 +66,9 @@ defineProps({ refund: Object });
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-line">
+                        <tr v-if="!refund.items?.length">
+                            <td colspan="4" class="px-4 py-10 text-center text-sm text-muted">Belum ada item retur.</td>
+                        </tr>
                         <tr v-for="item in refund.items" :key="item.id">
                             <td class="px-4 py-3 text-sm">{{ item.sale_item?.name_snapshot }}</td>
                             <td class="px-4 py-3 text-sm text-right">{{ Number(item.qty) }}</td>

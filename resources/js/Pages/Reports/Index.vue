@@ -2,12 +2,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Card from '@/Components/Card.vue';
 import PageHeader from '@/Components/PageHeader.vue';
-import FormInput from '@/Components/FormInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { formatRupiah, formatNumber } from '@/Utils/format';
-import { Download, Filter } from '@lucide/vue';
+import { Download, Filter, LoaderCircle } from '@lucide/vue';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -19,7 +18,10 @@ const props = defineProps({
     filters: Object,
 });
 
-const filters = props.filters;
+const dateFrom = ref(props.filters.date_from);
+const dateTo = ref(props.filters.date_to);
+const loading = ref(false);
+
 const reportTypes = [
     { key: 'sales', label: 'Penjualan' },
     { key: 'profit', label: 'Laba Kotor' },
@@ -29,6 +31,27 @@ const reportTypes = [
     { key: 'shifts', label: 'Shift' },
     { key: 'stock', label: 'Stok' },
 ];
+
+const loadReport = (nextType = props.type) => {
+    if (loading.value) {
+        return;
+    }
+
+    loading.value = true;
+
+    router.get(route('reports.index'), {
+        type: nextType,
+        date_from: dateFrom.value,
+        date_to: dateTo.value,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+        onFinish: () => {
+            loading.value = false;
+        },
+    });
+};
 
 const summaryLabel = (key) => ({
     total: 'Total',
@@ -66,15 +89,15 @@ const formatSummary = (key, value) => {
 
 const goExport = () => {
     const query = new URLSearchParams({
-        date_from: filters.date_from,
-        date_to: filters.date_to,
+        date_from: dateFrom.value,
+        date_to: dateTo.value,
     });
 
     window.location.href = `${route('reports.export', props.type)}?${query.toString()}`;
 };
 
 const goPdf = () => {
-    window.location.href = route('reports.pdf', props.type) + `?date_from=${filters.date_from}&date_to=${filters.date_to}`;
+    window.location.href = route('reports.pdf', props.type) + `?date_from=${dateFrom.value}&date_to=${dateTo.value}`;
 };
 </script>
 
@@ -93,60 +116,71 @@ const goPdf = () => {
             </PageHeader>
 
             <div class="mb-6 flex flex-wrap gap-2">
-                <Link
+                <button
                     v-for="report in reportTypes"
                     :key="report.key"
-                    :href="route('reports.show', report.key)"
+                    type="button"
+                    :disabled="loading"
                     :class="[
-                        'border-2 border-ink px-4 py-2 text-xs font-bold transition',
+                        'border-2 border-ink px-4 py-2 text-xs font-bold transition disabled:cursor-wait',
                         type === report.key ? 'bg-ink text-white' : 'bg-surface text-ink hover:bg-surface-2',
                     ]"
+                    @click="loadReport(report.key)"
                 >
                     {{ report.label }}
-                </Link>
+                </button>
             </div>
 
             <Card tone="surface">
                 <div class="grid gap-3 sm:grid-cols-[1fr_auto_auto] p-4">
                     <div class="relative">
                         <Filter class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-                        <input v-model="filters.date_from" type="date" class="h-11 pl-9 border-2 border-ink px-3 text-sm" />
+                        <input v-model="dateFrom" type="date" class="h-11 pl-9 border-2 border-ink px-3 text-sm" />
                     </div>
                     <div class="relative">
-                        <input v-model="filters.date_to" type="date" class="h-11 pl-9 border-2 border-ink px-3 text-sm" />
+                        <input v-model="dateTo" type="date" class="h-11 pl-9 border-2 border-ink px-3 text-sm" />
                     </div>
                     <div class="flex gap-2">
-                        <PrimaryButton as="link" :href="route('reports.show', props.type) + '?date_from=' + filters.date_from + '&date_to=' + filters.date_to">Tampilkan</PrimaryButton>
+                        <PrimaryButton type="button" :loading="loading" @click="loadReport()">Tampilkan</PrimaryButton>
                     </div>
                 </div>
             </Card>
 
-            <div class="mt-6 border-2 border-ink bg-surface shadow-hard overflow-hidden">
-                <div v-if="!rows.length" class="py-12 text-center text-sm text-muted">
-                    Tidak ada data pada periode yang dipilih.
+            <div class="relative mt-6 border-2 border-ink bg-surface shadow-hard overflow-hidden">
+                <div v-if="loading" class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-surface/85 px-4 text-center sm:gap-3">
+                    <LoaderCircle class="h-8 w-8 animate-spin text-violet-text sm:h-9 sm:w-9" />
+                    <p class="text-[11px] font-semibold leading-tight tracking-wide text-ink sm:text-xs">Memuat laporan...</p>
                 </div>
-                <table v-else class="w-full text-sm">
-                    <thead class="bg-surface-2">
-                        <tr>
-                            <th v-for="header in headers" :key="header" class="px-4 py-3 text-[11px] font-bold uppercase text-muted">{{ header }}</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-line">
-                        <tr v-for="row in rows" :key="row.join('|')" class="hover:bg-surface-2">
-                            <td v-for="(cell, index) in row" :key="index" class="px-4 py-4 text-sm" :class="numericHeaders.includes(headers[index] ?? '') ? 'text-right font-bold' : 'text-left'">
-                                {{ formatCell(headers[index], cell) }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
 
-                <div class="p-4 border-t-2 border-ink">
-                    <dl class="grid gap-2 sm:grid-cols-2">
-                        <div v-for="(value, key) in summary" :key="key" class="flex justify-between">
-                            <span class="text-xs text-muted">{{ summaryLabel(key) }}</span>
-                            <span class="text-sm font-bold text-ink">{{ typeof value === 'number' ? formatSummary(key, value) : value }}</span>
-                        </div>
-                    </dl>
+                <div :class="loading ? 'pointer-events-none opacity-40' : ''">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-surface-2">
+                                <tr>
+                                    <th v-for="header in headers" :key="header" class="px-4 py-3 text-[11px] font-bold uppercase text-muted">{{ header }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-line">
+                                <tr v-if="!rows.length">
+                                    <td :colspan="headers?.length || 1" class="px-4 py-12 text-center text-sm text-muted">Tidak ada data pada periode yang dipilih.</td>
+                                </tr>
+                                <tr v-for="row in rows" :key="row.join('|')" class="hover:bg-surface-2">
+                                    <td v-for="(cell, index) in row" :key="index" class="px-4 py-4 text-sm" :class="numericHeaders.includes(headers[index] ?? '') ? 'text-right font-bold' : 'text-left'">
+                                        {{ formatCell(headers[index], cell) }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-4 border-t-2 border-ink">
+                        <dl class="grid gap-2 sm:grid-cols-2">
+                            <div v-for="(value, key) in summary" :key="key" class="flex justify-between">
+                                <span class="text-xs text-muted">{{ summaryLabel(key) }}</span>
+                                <span class="text-sm font-bold text-ink">{{ typeof value === 'number' ? formatSummary(key, value) : value }}</span>
+                            </div>
+                        </dl>
+                    </div>
                 </div>
             </div>
         </div>

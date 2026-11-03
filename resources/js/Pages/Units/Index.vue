@@ -70,6 +70,9 @@ const destroy = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!units.data?.length">
+                            <td colspan="4" class="px-4 py-10 text-center text-sm text-muted">Belum ada satuan.</td>
+                        </tr>
                         <tr v-for="unit in units.data" :key="unit.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm font-semibold text-ink">{{ unit.name }}</td>
                             <td class="px-4 py-3 text-sm">{{ unit.short_name }}</td>

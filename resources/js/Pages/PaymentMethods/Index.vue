@@ -56,8 +56,7 @@ const destroy = () => {
             </PageHeader>
 
             <Card class="shadow-hard">
-                <div v-if="!paymentMethods.data?.length" class="text-center py-8"><p class="text-muted text-sm">Belum ada metode pembayaran.</p></div>
-                <div v-else class="overflow-x-auto">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr>
@@ -68,6 +67,9 @@ const destroy = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!paymentMethods.data?.length">
+                            <td colspan="4" class="px-4 py-10 text-center text-sm text-muted">Belum ada metode pembayaran.</td>
+                        </tr>
                         <tr v-for="method in paymentMethods.data" :key="method.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm font-semibold text-ink">{{ method.name }}</td>
                             <td class="px-4 py-3 text-sm">{{ types.find(t => t.value === method.type)?.label ?? method.type }}</td>

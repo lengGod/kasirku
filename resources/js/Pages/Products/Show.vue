@@ -50,6 +50,9 @@ defineProps({ product: Object });
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-line">
+                        <tr v-if="!product.movements?.length">
+                            <td colspan="4" class="px-4 py-10 text-center text-sm text-muted">Belum ada pergerakan stok.</td>
+                        </tr>
                         <tr v-for="movement in product.movements" :key="movement.id">
                             <td class="px-4 py-2 text-sm">{{ formatDateLong(movement.created_at) }}</td>
                             <td class="px-4 py-2 text-sm">{{ movement.type }}</td>

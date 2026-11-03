@@ -23,8 +23,7 @@ defineProps({ documents: Object });
             </PageHeader>
 
             <Card class="shadow-hard">
-                <div v-if="!documents.data?.length" class="text-center py-8"><p class="text-muted text-sm">Belum ada penerimaan stok.</p></div>
-                <div v-else class="overflow-x-auto">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-surface-2">
                         <tr>
@@ -36,6 +35,9 @@ defineProps({ documents: Object });
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-line">
+                        <tr v-if="!documents.data?.length">
+                            <td colspan="5" class="px-4 py-10 text-center text-sm text-muted">Belum ada penerimaan stok.</td>
+                        </tr>
                         <tr v-for="document in documents.data" :key="document.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm font-bold text-ink">{{ document.document_number }}</td>
                             <td class="px-4 py-3 text-sm">{{ document.supplier_name ?? '-' }}</td>

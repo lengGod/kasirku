@@ -22,8 +22,7 @@ defineProps({ refunds: Object });
             </PageHeader>
 
             <Card class="shadow-hard">
-                <div v-if="!refunds.data?.length" class="text-center py-8"><p class="text-muted text-sm">Belum ada retur.</p></div>
-                <div v-else class="overflow-x-auto">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr>
@@ -35,6 +34,9 @@ defineProps({ refunds: Object });
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!refunds.data?.length">
+                            <td colspan="5" class="px-4 py-10 text-center text-sm text-muted">Belum ada retur.</td>
+                        </tr>
                         <tr v-for="refund in refunds.data" :key="refund.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm font-bold text-ink">{{ refund.refund_number }}</td>
                             <td class="px-4 py-3 text-sm">{{ refund.sale?.invoice_number }}</td>

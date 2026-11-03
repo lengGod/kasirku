@@ -53,10 +53,7 @@ class SaleController extends Controller
                 'date_from' => $request->query('date_from'),
                 'date_to' => $request->query('date_to'),
             ],
-            'statuses' => collect(SaleStatus::cases())->map(fn (SaleStatus $status): array => [
-                'value' => $status->value,
-                'label' => $status->label(),
-            ]),
+            'statuses' => SaleStatus::options(),
         ]);
     }
 
@@ -66,6 +63,7 @@ class SaleController extends Controller
 
         return Inertia::render('Sales/Show', [
             'sale' => $sale,
+            'statuses' => SaleStatus::options(),
         ]);
     }
 

@@ -12,7 +12,9 @@ const props = defineProps({
 const printReceipt = () => {
     router.post(route('sales.print-log', props.sale.id), { is_copy: props.isCopy }, {
         preserveScroll: true,
-        onSuccess: () => window.print(),
+        onFinish: () => {
+            setTimeout(() => window.print(), 350);
+        },
     });
 };
 </script>

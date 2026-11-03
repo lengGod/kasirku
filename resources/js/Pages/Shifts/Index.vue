@@ -2,9 +2,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Card from '@/Components/Card.vue';
 import PageHeader from '@/Components/PageHeader.vue';
-import { Head } from '@inertiajs/vue3';
+import Pagination from '@/Components/Pagination.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import { Head, Link } from '@inertiajs/vue3';
 import { formatDateLong, formatRupiah, formatNumber } from '@/Utils/format';
-import { Link } from '@inertiajs/vue3';
 import { Package, CheckCircle } from '@lucide/vue';
 
 defineProps({ shifts: Object, openShift: Object });
@@ -73,6 +74,9 @@ defineProps({ shifts: Object, openShift: Object });
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-line">
+                        <tr v-if="!shifts.data?.length">
+                            <td colspan="8" class="px-4 py-10 text-center text-sm text-muted">Belum ada shift.</td>
+                        </tr>
                         <tr v-for="shift in shifts.data" :key="shift.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm text-ink">{{ shift.id }}</td>
                             <td class="px-4 py-3 text-sm">{{ shift.user?.name }}</td>
@@ -93,7 +97,7 @@ defineProps({ shifts: Object, openShift: Object });
                 </table>
 
                 <div v-if="shifts.last_page > 1" class="mt-4 flex justify-center">
-                    <pagination :paginator="shifts" />
+                    <Pagination :paginator="shifts" />
                 </div>
                 </div>
             </Card>

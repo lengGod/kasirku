@@ -75,8 +75,7 @@ const destroy = () => {
             </PageHeader>
 
             <Card class="shadow-hard">
-                <div v-if="!promotions.data?.length" class="text-center py-8"><p class="text-muted text-sm">Belum ada promosi.</p></div>
-                <div v-else class="overflow-x-auto">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr>
@@ -88,6 +87,9 @@ const destroy = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="!promotions.data?.length">
+                            <td colspan="5" class="px-4 py-10 text-center text-sm text-muted">Belum ada promosi.</td>
+                        </tr>
                         <tr v-for="promotion in promotions.data" :key="promotion.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm font-semibold text-ink">{{ promotion.name }}</td>
                             <td class="px-4 py-3 text-sm">{{ promotion.type === 'percentage' ? promotion.value + '%' : formatRupiah(promotion.value) }}</td>

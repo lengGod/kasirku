@@ -4,7 +4,16 @@ import PageHeader from '@/Components/PageHeader.vue';
 import { Head } from '@inertiajs/vue3';
 import { formatDateLong, formatRupiah, formatNumber } from '@/Utils/format';
 
-defineProps({ shift: Object, summary: Object });
+const props = defineProps({
+    shift: Object,
+    summary: Object,
+    statuses: {
+        type: Array,
+        default: () => [],
+    },
+});
+
+const statusLabel = (status) => props.statuses.find((item) => item.value === status)?.label ?? status;
 </script>
 
 <template>
@@ -77,12 +86,15 @@ defineProps({ shift: Object, summary: Object });
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-line">
+                        <tr v-if="!shift.sales?.length">
+                            <td colspan="5" class="px-4 py-10 text-center text-sm text-muted">Belum ada transaksi pada shift ini.</td>
+                        </tr>
                         <tr v-for="sale in shift.sales" :key="sale.id" class="hover:bg-surface-2">
                             <td class="px-4 py-3 text-sm">{{ sale.invoice_number }}</td>
                             <td class="px-4 py-3 text-sm text-muted">{{ formatDateLong(sale.created_at) }}</td>
                             <td class="px-4 py-3 text-sm">{{ sale.customer?.name ?? 'Umum' }}</td>
                             <td class="px-4 py-3 text-sm font-bold text-ink">{{ formatRupiah(sale.grand_total) }}</td>
-                            <td class="px-4 py-3 text-xs font-bold">{{ sale.status === 'paid' ? 'Dibayar' : sale.status }}</td>
+                            <td class="px-4 py-3 text-xs font-bold">{{ statusLabel(sale.status) }}</td>
                         </tr>
                     </tbody>
                 </table>
