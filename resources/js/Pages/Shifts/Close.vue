@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
-import FormInput from '@/Components/FormInput.vue';
+import MoneyInput from '@/Components/MoneyInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -36,7 +36,7 @@ const submit = () => {
                 <form @submit="submit" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-ink mb-1">Kas Aktual (Rp)</label>
-                        <input v-model="form.actual_cash" type="number" step="100" min="0" required class="h-12 w-full border-2 border-ink bg-surface px-4 text-sm text-ink focus:border-violet-text focus:outline-none" />
+                        <MoneyInput v-model="form.actual_cash" required />
                         <p class="mt-1 text-xs text-muted">Hitung uang tunai di lemari kas saat ini.</p>
                     </div>
 

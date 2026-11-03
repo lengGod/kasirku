@@ -48,7 +48,7 @@ use Illuminate\Support\Carbon;
                             <img src="{{ route('labels.barcode', $product->barcode) }}" class="barcode-img" alt="barcode">
                         @endif
                         <div class="name">{{ $product->name }}</div>
-                        <div class="price">{{ number_format($product->sell_price, 0, ',', '.') }}</div>
+                        <div class="price">Rp {{ number_format($product->sell_price, 0, ',', '.') }}</div>
                         <div class="sku">{{ $product->sku }}</div>
                     </div>
                 @endfor

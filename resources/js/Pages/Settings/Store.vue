@@ -2,6 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import FormInput from '@/Components/FormInput.vue';
+import MoneyInput from '@/Components/MoneyInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
@@ -50,11 +51,11 @@ const submit = () => {
                     </div>
                     <div>
                         <label class="mb-1 block text-sm font-semibold">Pembulatan</label>
-                        <FormInput v-model="form.rounding_step" type="number" min="0" placeholder="0 = matikan" />
+                        <MoneyInput v-model="form.rounding_step" placeholder="Rp 0" />
                     </div>
                     <div>
                         <label class="mb-1 block text-sm font-semibold">Maks Diskon Tanpa PIN</label>
-                        <FormInput v-model="form.max_discount_without_pin" type="number" min="0" />
+                        <MoneyInput v-model="form.max_discount_without_pin" />
                     </div>
                     <label class="flex items-center gap-2 text-sm font-semibold">
                         <input v-model="form.allow_negative_stock" type="checkbox" class="h-4 w-4 accent-lime" /> Izinkan stok negatif

@@ -61,38 +61,38 @@ use Illuminate\Support\Carbon;
         @foreach ($sale->items as $item)
             <div class="row">
                 <span>{{ $item->name_snapshot }}</span>
-                <span class="right-col">{{ $item->qty }} x {{ number_format($item->unit_price, 0, ',', '.') }}</span>
+                <span class="right-col">{{ $item->qty }} x Rp {{ number_format($item->unit_price, 0, ',', '.') }}</span>
             </div>
             <div class="row small">
                 <span></span>
-                <span class="right-col">{{ number_format($item->line_total, 0, ',', '.') }}</span>
+                <span class="right-col">Rp {{ number_format($item->line_total, 0, ',', '.') }}</span>
             </div>
             @if ($item->discount)
-                <div class="row small"><span>Diskon</span><span class="right-col">-{{ number_format($item->discount, 0, ',', '.') }}</span></div>
+                <div class="row small"><span>Diskon</span><span class="right-col">-Rp {{ number_format($item->discount, 0, ',', '.') }}</span></div>
             @endif
         @endforeach
 
         <div class="sep-solid"></div>
 
-        <div class="row bold"><span>Subtotal</span><span class="right-col">{{ number_format($sale->subtotal, 0, ',', '.') }}</span></div>
+        <div class="row bold"><span>Subtotal</span><span class="right-col">Rp {{ number_format($sale->subtotal, 0, ',', '.') }}</span></div>
         @if ($sale->discount_total)
-            <div class="row bold"><span>Diskon</span><span class="right-col">-{{ number_format($sale->discount_total, 0, ',', '.') }}</span></div>
+            <div class="row bold"><span>Diskon</span><span class="right-col">-Rp {{ number_format($sale->discount_total, 0, ',', '.') }}</span></div>
         @endif
-        <div class="row bold"><span>Pajak</span><span class="right-col">{{ number_format($sale->tax_total, 0, ',', '.') }}</span></div>
+        <div class="row bold"><span>Pajak</span><span class="right-col">Rp {{ number_format($sale->tax_total, 0, ',', '.') }}</span></div>
         @if ($sale->rounding)
-            <div class="row bold"><span>Pembulatan</span><span class="right-col">{{ number_format($sale->rounding, 0, ',', '.') }}</span></div>
+            <div class="row bold"><span>Pembulatan</span><span class="right-col">Rp {{ number_format($sale->rounding, 0, ',', '.') }}</span></div>
         @endif
-        <div class="row bold sep-solid"><span>TOTAL</span><span class="right-col">{{ number_format($sale->grand_total, 0, ',', '.') }}</span></div>
+        <div class="row bold sep-solid"><span>TOTAL</span><span class="right-col">Rp {{ number_format($sale->grand_total, 0, ',', '.') }}</span></div>
 
         <div class="sep"></div>
 
         @foreach ($sale->payments as $payment)
             <div class="row">
                 <span>{{ optional($payment->paymentMethod)->name }}</span>
-                <span class="right-col">{{ number_format($payment->amount, 0, ',', '.') }}</span>
+                <span class="right-col">Rp {{ number_format($payment->amount, 0, ',', '.') }}</span>
             </div>
         @endforeach
-        <div class="row bold"><span>Kembalian</span><span class="right-col">{{ number_format($sale->change_amount, 0, ',', '.') }}</span></div>
+        <div class="row bold"><span>Kembalian</span><span class="right-col">Rp {{ number_format($sale->change_amount, 0, ',', '.') }}</span></div>
 
         <div class="sep"></div>
 

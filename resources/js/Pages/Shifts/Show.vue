@@ -81,7 +81,7 @@ const statusLabel = (status) => props.statuses.find((item) => item.value === sta
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-muted">Struk</th>
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-muted">Tanggal</th>
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-muted">Pelanggan</th>
-                            <th class="px-4 py-3 text-[11px] font-bold uppercase text-muted">Total</th>
+                            <th class="px-4 py-3 text-[11px] font-bold uppercase text-muted text-right">Total</th>
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-muted">Status</th>
                         </tr>
                     </thead>
@@ -93,7 +93,7 @@ const statusLabel = (status) => props.statuses.find((item) => item.value === sta
                             <td class="px-4 py-3 text-sm">{{ sale.invoice_number }}</td>
                             <td class="px-4 py-3 text-sm text-muted">{{ formatDateLong(sale.created_at) }}</td>
                             <td class="px-4 py-3 text-sm">{{ sale.customer?.name ?? 'Umum' }}</td>
-                            <td class="px-4 py-3 text-sm font-bold text-ink">{{ formatRupiah(sale.grand_total) }}</td>
+                            <td class="px-4 py-3 text-sm font-bold text-ink text-right">{{ formatRupiah(sale.grand_total) }}</td>
                             <td class="px-4 py-3 text-xs font-bold">{{ statusLabel(sale.status) }}</td>
                         </tr>
                     </tbody>

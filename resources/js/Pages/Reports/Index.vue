@@ -64,14 +64,18 @@ const summaryLabel = (key) => ({
 }[key] ?? key);
 
 const numericHeaders = ['Qty', 'Qty Terjual', 'Penjualan', 'HPP', 'Laba', 'Total', 'Total Penjualan', 'Jumlah Transaksi', 'Jumlah Pembayaran', 'Selisih', 'Modal', 'Ekspektasi', 'Aktual', 'Nilai Stok', 'Stok', 'Harga Beli'];
+const currencyHeaders = ['Penjualan', 'HPP', 'Laba', 'Total', 'Total Penjualan', 'Selisih', 'Modal', 'Ekspektasi', 'Aktual', 'Nilai Stok', 'Harga Beli'];
+
+const isNumericHeader = (header) => numericHeaders.includes(header);
+const isCurrencyHeader = (header) => currencyHeaders.includes(header);
 
 const formatCell = (header, value) => {
-    if (typeof value === 'number' || (!isNaN(Number(value)) && value !== '')) {
-        const lower = String(header).toLowerCase();
-        if (lower.includes('qty') || lower.includes('transaksi') || lower.includes('total')) {
-            return formatNumber(value, lower.includes('qty') ? 0 : 2);
-        }
+    if (isCurrencyHeader(header)) {
         return formatRupiah(value);
+    }
+
+    if (isNumericHeader(header)) {
+        return formatNumber(value, 0);
     }
 
     return value;
@@ -157,7 +161,7 @@ const goPdf = () => {
                         <table class="w-full text-sm">
                             <thead class="bg-surface-2">
                                 <tr>
-                                    <th v-for="header in headers" :key="header" class="px-4 py-3 text-[11px] font-bold uppercase text-muted">{{ header }}</th>
+                                    <th v-for="header in headers" :key="header" class="px-4 py-3 text-[11px] font-bold uppercase text-muted" :class="isNumericHeader(header) ? 'text-right' : 'text-left'">{{ header }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-line">
@@ -165,7 +169,7 @@ const goPdf = () => {
                                     <td :colspan="headers?.length || 1" class="px-4 py-12 text-center text-sm text-muted">Tidak ada data pada periode yang dipilih.</td>
                                 </tr>
                                 <tr v-for="row in rows" :key="row.join('|')" class="hover:bg-surface-2">
-                                    <td v-for="(cell, index) in row" :key="index" class="px-4 py-4 text-sm" :class="numericHeaders.includes(headers[index] ?? '') ? 'text-right font-bold' : 'text-left'">
+                                    <td v-for="(cell, index) in row" :key="index" class="px-4 py-4 text-sm" :class="isNumericHeader(headers[index] ?? '') ? 'text-right font-bold' : 'text-left'">
                                         {{ formatCell(headers[index], cell) }}
                                     </td>
                                 </tr>

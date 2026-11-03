@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import FormInput from '@/Components/FormInput.vue';
 import FormSelect from '@/Components/FormSelect.vue';
+import MoneyInput from '@/Components/MoneyInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import Modal from '@/Components/Modal.vue';
@@ -616,7 +617,7 @@ watch(search, () => {
                         </FormSelect>
 
                         <label class="mb-1 block text-xs font-bold uppercase tracking-wide text-muted">Diskon Transaksi (Rp)</label>
-                        <FormInput v-model="discountTotal" type="number" min="0" class="mb-3" />
+                        <MoneyInput v-model="discountTotal" class="mb-3" />
 
                         <div class="space-y-1 border-t border-line pt-3 text-sm">
                             <div class="flex justify-between"><span class="text-muted">Subtotal</span><span class="font-semibold">{{ formatRupiah(subtotal) }}</span></div>
@@ -661,7 +662,7 @@ watch(search, () => {
                             <FormSelect v-model="payment.payment_method_id">
                                 <option v-for="method in paymentMethods" :key="method.id" :value="method.id">{{ method.name }}</option>
                             </FormSelect>
-                            <FormInput v-model="payment.amount" type="number" min="0" placeholder="Jumlah" />
+                            <MoneyInput v-model="payment.amount" placeholder="Rp 0" />
                             <button v-if="payments.length > 1" type="button" class="flex h-12 w-12 items-center justify-center border-2 border-ink text-bad-fg hover:bg-bad-bg" @click="removePaymentRow(index)">
                                 <Trash2 class="h-4 w-4" />
                             </button>

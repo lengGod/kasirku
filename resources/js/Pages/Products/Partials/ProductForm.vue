@@ -1,6 +1,7 @@
 <script setup>
 import FormInput from '@/Components/FormInput.vue';
 import FormSelect from '@/Components/FormSelect.vue';
+import MoneyInput from '@/Components/MoneyInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import InputError from '@/Components/InputError.vue';
@@ -75,12 +76,12 @@ const submit = () => {
             </div>
             <div>
                 <label class="mb-1 block text-sm font-semibold text-ink">Harga Beli</label>
-                <FormInput v-model="form.cost_price" type="number" min="0" step="100" />
+                <MoneyInput v-model="form.cost_price" />
                 <InputError :message="form.errors.cost_price" class="mt-1" />
             </div>
             <div>
                 <label class="mb-1 block text-sm font-semibold text-ink">Harga Jual</label>
-                <FormInput v-model="form.sell_price" type="number" min="0" step="100" />
+                <MoneyInput v-model="form.sell_price" />
                 <InputError :message="form.errors.sell_price" class="mt-1" />
             </div>
             <div>

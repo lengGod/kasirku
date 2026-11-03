@@ -1,5 +1,8 @@
 @php
 use Illuminate\Support\Carbon;
+
+$numericHeaders = ['Qty', 'Qty Terjual', 'Jumlah Transaksi', 'Jumlah Pembayaran', 'Stok'];
+$currencyHeaders = ['Penjualan', 'HPP', 'Laba', 'Total', 'Total Penjualan', 'Selisih', 'Modal', 'Ekspektasi', 'Aktual', 'Nilai Stok', 'Harga Beli'];
 @endphp
 
 <!DOCTYPE html>
@@ -15,6 +18,7 @@ use Illuminate\Support\Carbon;
         .subtitle { font-size: 11px; color: #555; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 12px; }
         th { background: #14123A; color: #fff; text-align: left; padding: 6px 8px; font-size: 10px; text-transform: uppercase; }
+        th.numeric, td.numeric { text-align: right; }
         td { border-bottom: 1px solid #D5D7E6; padding: 5px 8px; font-size: 11px; }
         tr:nth-child(even) td { background: #F6F7FB; }
         .summary { margin-top: 16px; width: auto; float: right; }
@@ -31,15 +35,21 @@ use Illuminate\Support\Carbon;
         <thead>
             <tr>
                 @foreach ($headers as $header)
-                    <th>{{ $header }}</th>
+                    <th class="{{ in_array($header, array_merge($numericHeaders, $currencyHeaders), true) ? 'numeric' : '' }}">{{ $header }}</th>
                 @endforeach
             </tr>
         </thead>
         <tbody>
             @foreach ($rows as $row)
                 <tr>
-                    @foreach ($row as $cell)
-                        <td>{{ $cell }}</td>
+                    @foreach ($row as $index => $cell)
+                        <td class="{{ in_array($headers[$index] ?? '', array_merge($numericHeaders, $currencyHeaders), true) ? 'numeric' : '' }}">
+                            @if (in_array($headers[$index] ?? '', $currencyHeaders, true) && is_numeric($cell))
+                                Rp {{ number_format((float) $cell, 0, ',', '.') }}
+                            @else
+                                {{ $cell }}
+                            @endif
+                        </td>
                     @endforeach
                 </tr>
             @endforeach
@@ -52,7 +62,7 @@ use Illuminate\Support\Carbon;
                 @foreach ($summary as $key => $value)
                     <tr>
                         <td>{{ $key }}</td>
-                        <td>{{ is_numeric($value) ? number_format($value, 0, ',', '.') : $value }}</td>
+                        <td>{{ is_numeric($value) ? (in_array($key, ['total', 'penjualan', 'laba', 'nilai', 'selisih'], true) ? 'Rp '.number_format($value, 0, ',', '.') : number_format($value, 0, ',', '.')) : $value }}</td>
                     </tr>
                 @endforeach
             </tbody>

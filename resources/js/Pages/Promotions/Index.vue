@@ -4,6 +4,7 @@ import Card from '@/Components/Card.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import Modal from '@/Components/Modal.vue';
 import FormInput from '@/Components/FormInput.vue';
+import MoneyInput from '@/Components/MoneyInput.vue';
 import FormSelect from '@/Components/FormSelect.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
@@ -118,7 +119,8 @@ const destroy = () => {
                         <option value="percentage">Persentase</option>
                         <option value="nominal">Nominal</option>
                     </FormSelect>
-                    <FormInput v-model="form.value" type="number" min="0" required placeholder="Nilai" />
+                    <MoneyInput v-if="form.type === 'nominal'" v-model="form.value" required placeholder="Rp 0" />
+                    <FormInput v-else v-model="form.value" type="number" min="0" step="0.01" required placeholder="Persentase" />
                     <FormSelect v-model="form.target">
                         <option value="product">Produk</option>
                         <option value="category">Kategori</option>

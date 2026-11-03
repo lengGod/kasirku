@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import FormInput from '@/Components/FormInput.vue';
 import FormSelect from '@/Components/FormSelect.vue';
+import MoneyInput from '@/Components/MoneyInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, useForm } from '@inertiajs/vue3';
@@ -79,7 +80,7 @@ const submit = () => {
                             <option v-for="product in products" :key="product.id" :value="product.id">{{ product.name }} ({{ product.unit?.short_name }})</option>
                         </FormSelect>
                         <FormInput v-model="item.qty" type="number" min="0.001" step="0.001" placeholder="Qty" required />
-                        <FormInput v-model="item.cost_price" type="number" min="0" step="100" placeholder="Harga beli" />
+                        <MoneyInput v-model="item.cost_price" placeholder="Harga beli" />
                         <button type="button" class="flex h-12 w-12 items-center justify-center border-2 border-ink text-bad-fg hover:bg-bad-bg" @click="removeItem(index)">
                             <Trash2 class="h-4 w-4" />
                         </button>
