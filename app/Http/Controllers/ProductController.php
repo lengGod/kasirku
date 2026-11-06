@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementType;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
@@ -94,6 +95,10 @@ class ProductController extends Controller
     {
         return Inertia::render('Products/Show', [
             'product' => $product->load(['category', 'unit', 'stocks', 'movements.user' => fn ($query) => $query->latest('created_at')->limit(10)]),
+            'types' => collect(MovementType::cases())->map(fn (MovementType $type): array => [
+                'value' => $type->value,
+                'label' => $type->label(),
+            ]),
         ]);
     }
 

@@ -1,6 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Card from '@/Components/Card.vue';
 import PageHeader from '@/Components/PageHeader.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { Head } from '@inertiajs/vue3';
 import { formatDateLong, formatRupiah, formatNumber } from '@/Utils/format';
 

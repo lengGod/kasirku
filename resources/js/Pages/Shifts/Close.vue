@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Card from '@/Components/Card.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import MoneyInput from '@/Components/MoneyInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -7,9 +8,9 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { formatRupiah } from '@/Utils/format';
 
-defineProps({ shift: Object, summary: Object });
+const props = defineProps({ shift: Object, summary: Object });
 
-const form = useForm({ actual_cash: summary?.expected_cash ?? '' });
+const form = useForm({ actual_cash: props.summary?.expected_cash ?? '' });
 
 const submit = () => {
     form.post(route('shifts.store-close'));
@@ -33,7 +34,7 @@ const submit = () => {
                     <p class="font-display text-2xl font-bold text-ink">{{ formatRupiah(summary.expected_cash ?? 0) }}</p>
                 </div>
 
-                <form @submit="submit" class="space-y-4">
+                <form @submit.prevent="submit" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-ink mb-1">Kas Aktual (Rp)</label>
                         <MoneyInput v-model="form.actual_cash" required />

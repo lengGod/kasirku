@@ -4,6 +4,8 @@ import Card from '@/Components/Card.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import Modal from '@/Components/Modal.vue';
 import FormInput from '@/Components/FormInput.vue';
+import FormSelect from '@/Components/FormSelect.vue';
+import DeleteConfirm from '@/Components/DeleteConfirm.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { Head, useForm, router } from '@inertiajs/vue3';

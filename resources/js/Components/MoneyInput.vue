@@ -18,13 +18,26 @@ const rawValue = (value) => {
         return '';
     }
 
-    return String(value).replace(/[^\d]/g, '');
+    if (typeof value === 'number') {
+        return String(Math.round(value));
+    }
+
+    const text = String(value).trim();
+
+    if (/^-?\d{1,3}(\.\d{3})+$/.test(text)) {
+        return text.replace(/[^\d]/g, '');
+    }
+
+    if (/^-?\d+(\.\d+)?$/.test(text)) {
+        return String(Math.round(Number(text)));
+    }
+
+    return text.replace(/[^\d]/g, '');
 };
 
 const setFormattedValue = (value) => {
-    displayValue.value = value === null || value === undefined || value === ''
-        ? ''
-        : formatRupiah(value);
+    const raw = rawValue(value);
+    displayValue.value = raw === '' ? '' : formatRupiah(raw);
 };
 
 watch(model, (value) => {
@@ -34,14 +47,14 @@ watch(model, (value) => {
 }, { immediate: true });
 
 const focusInput = async () => {
-    displayValue.value = rawValue(model.value);
+    setFormattedValue(model.value);
     await nextTick();
     input.value?.select();
 };
 
 const updateValue = (event) => {
     const raw = rawValue(event.target.value);
-    displayValue.value = raw;
+    displayValue.value = raw === '' ? '' : formatRupiah(raw);
     model.value = raw === '' ? '' : Number(raw);
 };
 

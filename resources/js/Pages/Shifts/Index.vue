@@ -67,8 +67,8 @@ defineProps({ shifts: Object, openShift: Object });
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-white">Kasir</th>
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-white">Dibuka</th>
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-white">Ditutup</th>
-                            <th class="px-4 py-3 text-[11px] font-bold uppercase text-white">Transaksi</th>
-                            <th class="px-4 py-3 text-[11px] font-bold uppercase text-white">Total</th>
+                            <th class="px-4 py-3 text-[11px] font-bold uppercase text-white text-right">Transaksi</th>
+                            <th class="px-4 py-3 text-[11px] font-bold uppercase text-white text-right">Total</th>
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-white">Status</th>
                             <th class="px-4 py-3 text-[11px] font-bold uppercase text-white"></th>
                         </tr>
@@ -82,8 +82,8 @@ defineProps({ shifts: Object, openShift: Object });
                             <td class="px-4 py-3 text-sm">{{ shift.user?.name }}</td>
                             <td class="px-4 py-3 text-sm">{{ formatDateLong(shift.opened_at) }}</td>
                             <td class="px-4 py-3 text-sm">{{ shift.closed_at ? formatDateLong(shift.closed_at) : '-' }}</td>
-                            <td class="px-4 py-3 text-sm">{{ formatNumber(shift.sales_count ?? 0, 0) }}</td>
-                            <td class="px-4 py-3 text-sm">{{ formatRupiah(shift.sales_total ?? 0) }}</td>
+                            <td class="px-4 py-3 text-sm text-right">{{ formatNumber(shift.sales_count ?? 0, 0) }}</td>
+                            <td class="px-4 py-3 text-sm text-right">{{ formatRupiah(shift.sales_total ?? 0) }}</td>
                             <td class="px-4 py-3">
                                 <span :class="['inline-flex h-7 items-center gap-1 px-2 py-0.5 border text-xs font-bold', shift.status === 'open' ? 'border-lime bg-lime/10 text-lime' : 'border-ink text-ink']">
                                     {{ shift.status === 'open' ? 'Terbuka' : 'Ditutup' }}

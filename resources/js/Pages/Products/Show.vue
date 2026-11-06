@@ -5,7 +5,15 @@ import { Head, Link } from '@inertiajs/vue3';
 import { formatDateLong, formatNumber, formatRupiah } from '@/Utils/format';
 import { ArrowLeft } from '@lucide/vue';
 
-defineProps({ product: Object });
+const props = defineProps({
+    product: Object,
+    types: {
+        type: Array,
+        default: () => [],
+    },
+});
+
+const typeLabel = (type) => props.types.find((item) => item.value === type)?.label ?? type;
 </script>
 
 <template>
@@ -55,7 +63,7 @@ defineProps({ product: Object });
                         </tr>
                         <tr v-for="movement in product.movements" :key="movement.id">
                             <td class="px-4 py-2 text-sm">{{ formatDateLong(movement.created_at) }}</td>
-                            <td class="px-4 py-2 text-sm">{{ movement.type }}</td>
+                            <td class="px-4 py-2 text-sm">{{ typeLabel(movement.type) }}</td>
                             <td class="px-4 py-2 text-sm text-right font-bold">{{ formatNumber(movement.qty, 0) }}</td>
                             <td class="px-4 py-2 text-sm text-right">{{ formatNumber(movement.balance_after, 0) }}</td>
                         </tr>

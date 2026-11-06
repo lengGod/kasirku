@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Card from '@/Components/Card.vue';
 import PageHeader from '@/Components/PageHeader.vue';
 import MoneyInput from '@/Components/MoneyInput.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -27,7 +28,7 @@ const submit = () => {
             </PageHeader>
 
             <Card tone="surface">
-                <form @submit="submit" class="space-y-4">
+                <form @submit.prevent="submit" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-ink mb-1">Modal Awal (Rp)</label>
                         <MoneyInput v-model="form.opening_cash" required />

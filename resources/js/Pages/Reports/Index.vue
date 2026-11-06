@@ -177,11 +177,11 @@ const goPdf = () => {
                         </table>
                     </div>
 
-                    <div class="p-4 border-t-2 border-ink">
-                        <dl class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                            <div v-for="(value, key) in summary" :key="key" class="flex justify-between">
-                                <span class="text-xs text-muted">{{ summaryLabel(key) }}</span>
-                                <span class="text-sm font-bold text-ink">{{ typeof value === 'number' ? formatSummary(key, value) : value }}</span>
+                    <div class="border-t-2 border-ink p-4">
+                        <dl class="flex flex-wrap items-center justify-end gap-x-6 gap-y-2">
+                            <div v-for="(value, key) in summary" :key="key" class="flex items-baseline gap-2">
+                                <dt class="text-xs text-muted">{{ summaryLabel(key) }}</dt>
+                                <dd class="text-sm font-bold text-ink">{{ typeof value === 'number' ? formatSummary(key, value) : value }}</dd>
                             </div>
                         </dl>
                     </div>

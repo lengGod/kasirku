@@ -19,7 +19,11 @@ class ShiftController extends Controller
     public function index(Request $request, ShiftService $shifts): Response
     {
         $user = $request->user();
-        $query = Shift::query()->with('user')->withCount('sales')->latest('opened_at');
+        $query = Shift::query()
+            ->with('user')
+            ->withCount(['sales as sales_count' => fn ($query) => $query->where('status', '!=', SaleStatus::Voided->value)])
+            ->withSum(['sales as sales_total' => fn ($query) => $query->where('status', '!=', SaleStatus::Voided->value)], 'grand_total')
+            ->latest('opened_at');
 
         if (! $user->canViewReports()) {
             $query->where('user_id', $user->id);

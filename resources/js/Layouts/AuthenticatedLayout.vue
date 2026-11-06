@@ -119,8 +119,9 @@ watch(showMobileMenu, (val) => {
         <nav class="fixed top-9 left-0 right-0 h-16 bg-ink flex items-center px-4 sm:px-6 z-50 shadow-hard">
             <div class="flex items-center justify-between w-full max-w-full gap-2">
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <Link :href="route('dashboard')" class="text-lime font-bold text-lg sm:text-xl font-display hover:text-yellow-300 transition flex-shrink-0">
-                        KasirKu
+                    <Link :href="route('dashboard')" class="flex items-center gap-2 text-lime font-bold text-lg sm:text-xl font-display hover:text-yellow-300 transition flex-shrink-0">
+                        <img src="/favicon.svg" alt="Logo KasirKu" class="h-8 w-8 rounded-md object-contain" />
+                        <span>KasirKu</span>
                     </Link>
                 </div>
 
@@ -193,8 +194,9 @@ watch(showMobileMenu, (val) => {
             <aside v-if="showMobileMenu" class="lg:hidden fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-ink z-[9999] flex flex-col shadow-hard">
                 <!-- Drawer Header -->
                 <div class="h-16 flex items-center justify-between px-4 border-b border-ink-3 flex-shrink-0">
-                    <Link :href="route('dashboard')" @click="closeMobileMenu" class="text-lime font-bold text-xl font-display">
-                        KasirKu
+                    <Link :href="route('dashboard')" @click="closeMobileMenu" class="flex items-center gap-2 text-lime font-bold text-xl font-display">
+                        <img src="/favicon.svg" alt="Logo KasirKu" class="h-8 w-8 rounded-md object-contain" />
+                        <span>KasirKu</span>
                     </Link>
                     <button @click="closeMobileMenu" class="text-white hover:text-lime transition p-2 -mr-2" aria-label="Tutup menu">
                         <X class="w-6 h-6" />
